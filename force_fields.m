@@ -1,9 +1,12 @@
-function force_fields()
+% Quiver plot of the development of weights over time
+function force_fields(ddir)
 
-clear all;
-close all;
+% parameters
 
-% parameters (many of these should be automatically determined from a file
+videoQuality = 100;
+videoFPS = 2;
+
+% (TODO: many of these should be automatically determined from a file
 % written by the Visumotor learning application)
 
 nRows = 5;                % rows of the input image
@@ -13,48 +16,117 @@ nOutputs = 10;            % numver of neurons in the output layer
 populationMin = -20.0;    % min (left) value of population coding
 populationMax = 20;       % max (right) value of population coding
 
-[xfile,xpath] = uigetfile({'*.log', 'Log files (comma separated)'}, 'Select weight log file for x-axis');
-if (isequal(xfile, 0))
-    disp('User canceled function');
+plot_cols = 5;            % number of columns in the plot
+
+if nargin < 1
+    ddir = uigetdir('..', 'Select directory containing experiment log files');
+    if (isequal(ddir, 0))
+        disp('User canceled function');
+        return
+    end
+end
+
+% take date from directory name
+[~, date, ~] = fileparts(ddir);
+
+xfiles = dir(fullfile(ddir, 'weights_x_in_*.log'));
+yfiles = dir(fullfile(ddir, 'weights_y_in_*.log'));
+nx = length(xfiles);
+ny = length(yfiles);
+
+% assume number of neurons equal for x and y, otherwise the
+% rest of the script won't work
+if nx == 0 || ny == 0 || nx ~= ny
     return
 end
 
-[yfile,ypath] = uigetfile({'*.log', 'Log files (comma separated)'}, 'Select weight log file for y-axis');
-if (isequal(yfile, 0))
-    disp('User canceled function');
-    return
+% files don't necessarily get listed in numerical correct order,
+% thus extract the input index from the file name using a regexp
+for i=1:nx
+    num = regexp(xfiles(i).name, 'weights_x_in_(\d+)_.*\.log', 'tokens');
+    % index + 1 since indices start at 1, not 0 in MATLAB
+    n = str2double(num{1}) + 1;
+    Wx(:,:,n) = importdata(fullfile(ddir, xfiles(i).name));
 end
 
-wx = load (fullfile(xpath,xfile));
-wy = load (fullfile(ypath,yfile));
+for i=1:ny
+    num = regexp(yfiles(i).name, 'weights_y_in_(\d+)_.*\.log', 'tokens');
+    % index + 1 since indices start at 1, not 0 in MATLAB
+    n = str2double(num{1}) + 1;
+    Wy(:,:,n) = importdata(fullfile(ddir, yfiles(i).name));
+end
 
 interval = (populationMax - populationMin) / (nOutputs - 1);
-oMovement = (populationMin:interval:populationMax)'; % this should be read from a log file
+oMovement = (populationMin:interval:populationMax)';
 
-oMovementx = oMovement;
-oMovementy = oMovement;
-
-time = wx(:,1);
-wx = wx(:,2:end);
-wy = wy(:,2:end);
-
-size(wx)
-size(wy)
-
+time = Wx(:,1,1);
 T = length(time);
 
-movex = zeros(T,1);
-movey = zeros(T,1);
+figure;
 
-for t=1:T
-    wxt = wx(t,:);
-    wyt = wy(t,:);
+% plot movements for each of the neurons
+for i=1:nx
+    wx = Wx(:,2:end,i);
+    wy = Wy(:,2:end,i);
 
-    oTotalx = sum(wxt);
-    oTotaly = sum(wyt);
+    movex = zeros(T,1);
+    movey = zeros(T,1);
 
-    movex(t) = wxt * oMovementx ./ oTotalx;
-    movey(t) = wyt * oMovementy ./ oTotaly;
+    for t=1:T
+        wxt = wx(t,:);
+        wyt = wy(t,:);
+
+        oTotalx = sum(wxt);
+        oTotaly = sum(wyt);
+
+        movex(t) = wxt * oMovement ./ oTotalx;
+        movey(t) = wyt * oMovement ./ oTotaly;
+    end
+
+    subplot(ceil(nx/plot_cols), plot_cols, i);
+    plot([movex movey]);
 end
 
-plot([movex movey]);
+% prepare video creation
+vidFile = sprintf('force_field_%s.avi', date);
+vid = VideoWriter(fullfile(ddir, vidFile));
+vid.Quality = videoQuality;
+vid.FrameRate = videoFPS;
+open(vid);
+
+figure;
+
+for t=1:T
+    dx = zeros(nx, 1);
+    dy = zeros(nx, 1);    
+    
+    for i=1:nx
+        wxt = Wx(t,2:end,i);
+        wyt = Wy(t,2:end,i);
+        
+        oTotalx = sum(wxt);
+        oTotaly = sum(wyt);
+        
+        dx(i) = wxt * oMovement ./ oTotalx;
+        dy(i) = wyt * oMovement ./ oTotaly;
+    end
+
+    dx = reshape(dx, nRows, nCols);
+    dy = reshape(dy, nRows, nCols);
+    
+    % flip up to down since 0,0 is the input neuron for the upper left
+    % corner
+    dx = flipud(dx);
+    dy = flipud(dy);
+    
+    % for each time step build up a quiver plot
+    quiver(dx,dy);
+    axis square;
+    f = getframe(gcf);
+    writeVideo(vid, f);
+    pause(1/2);
+end
+
+close(vid);
+
+end % function force_fields()
