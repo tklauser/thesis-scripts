@@ -122,9 +122,10 @@ for t=1:T
     % for each time step build up a quiver plot
     quiver(dx,dy);
     axis square;
+    axis([0,nCols+1,0,nRows+1]);
     f = getframe(gcf);
     writeVideo(vid, f);
-    pause(1/2);
+    pause(1/4);
 end
 
 close(vid);
