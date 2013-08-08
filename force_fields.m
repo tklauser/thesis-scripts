@@ -4,7 +4,7 @@ function force_fields(ddir)
 % parameters
 
 videoQuality = 100;
-videoFPS = 2;
+videoFPS = 4;
 
 % (TODO: many of these should be automatically determined from a file
 % written by the Visumotor learning application)
