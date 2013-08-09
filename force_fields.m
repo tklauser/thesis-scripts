@@ -5,24 +5,36 @@ function force_fields(ddir)
 
 videoQuality = 100;
 videoFPS = 4;
-
-% (TODO: many of these should be automatically determined from a file
-% written by the Visumotor learning application)
-
-nRows = 5;                % rows of the input image
-nCols = 5;                % columns of the input image
-nInputs = nRows * nCols;  % number of neurons in the input layer
-nOutputs = 10;            % numver of neurons in the output layer
-populationMin = -20.0;    % min (left) value of population coding
-populationMax = 20;       % max (right) value of population coding
-
 plot_cols = 5;            % number of columns in the plot
+
+% experiment default values, can be overriden by params.log
+nRows = 5;                  % rows of the input image
+nCols = 5;                  % columns of the input image
+nInputs = nRows * nCols;    % number of neurons in the input layer
+nOutputs = 10;              % number of neurons in the output layer
+populationMinX = -20.0;     % min (left) X value of population coding
+populationMaxX = 20;        % max (right) X value of population coding
+populationMinY = -20.0;     % min (left) Y value of population coding
+populationMaxY = 20;        % max (right) Y value of population coding
 
 if nargin < 1
     ddir = uigetdir('..', 'Select directory containing experiment log files');
     if (isequal(ddir, 0))
         disp('User canceled function');
         return
+    end
+end
+
+% if we have a file specifying the parameters, use them from there
+if exist(fullfile(ddir, 'params.log'), 'file') == 2
+    params = importdata(fullfile(ddir, 'params.log'), ',', 1);
+    % only use complete parameter set
+    if length(params.data) == 8
+        pCells = num2cell(params.data);
+        % first entry is time, because of the file format -> ignore
+        [~, nRows, nCols, nOutputs, ...
+            populationMinX, populationMaxX, ...
+            populationMinY, populationMaxY] = pCells{:};
     end
 end
 
@@ -59,8 +71,10 @@ for i=1:ny
     Wy(:,:,n) = importdata(fullfile(ddir, yfiles(i).name));
 end
 
-interval = (populationMax - populationMin) / (nOutputs - 1);
-oMovement = (populationMin:interval:populationMax)';
+intervalX = (populationMaxX - populationMinX) / (nOutputs - 1);
+intervalY = (populationMaxY - populationMinY) / (nOutputs - 1);
+oMovementX = (populationMinX:intervalX:populationMaxX)';
+oMovementY = (populationMinY:intervalY:populationMaxY)';
 
 time = Wx(:,1,1);
 T = length(time);
@@ -79,11 +93,11 @@ for i=1:nx
         wxt = wx(t,:);
         wyt = wy(t,:);
 
-        oTotalx = sum(wxt);
-        oTotaly = sum(wyt);
+        oTotalX = sum(wxt);
+        oTotalY = sum(wyt);
 
-        movex(t) = wxt * oMovement ./ oTotalx;
-        movey(t) = wyt * oMovement ./ oTotaly;
+        movex(t) = wxt * oMovementX ./ oTotalX;
+        movey(t) = wyt * oMovementY ./ oTotalY;
     end
 
     subplot(ceil(nx/plot_cols), plot_cols, i);
@@ -107,11 +121,11 @@ for t=1:T
         wxt = Wx(t,2:end,i);
         wyt = Wy(t,2:end,i);
         
-        oTotalx = sum(wxt);
-        oTotaly = sum(wyt);
+        oTotalX = sum(wxt);
+        oTotalY = sum(wyt);
         
-        dx(i) = wxt * oMovement ./ oTotalx;
-        dy(i) = wyt * oMovement ./ oTotaly;
+        dx(i) = wxt * oMovementX ./ oTotalX;
+        dy(i) = wyt * oMovementY ./ oTotalY;
     end
 
     dx = reshape(dx, nRows, nCols);
