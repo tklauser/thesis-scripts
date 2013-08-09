@@ -29,8 +29,8 @@ end
 % take date from directory name
 [~, date, ~] = fileparts(ddir);
 
-xfiles = dir(fullfile(ddir, 'weights_x_in_*.log'));
-yfiles = dir(fullfile(ddir, 'weights_y_in_*.log'));
+xfiles = dir(fullfile(ddir, 'weights_x_in*.log'));
+yfiles = dir(fullfile(ddir, 'weights_y_in*.log'));
 nx = length(xfiles);
 ny = length(yfiles);
 
@@ -46,14 +46,14 @@ end
 % files don't necessarily get listed in numerical correct order,
 % thus extract the input index from the file name using a regexp
 for i=1:nx
-    num = regexp(xfiles(i).name, 'weights_x_in_(\d+)_.*\.log', 'tokens');
+    num = regexp(xfiles(i).name, 'weights_x_in_(\d+).*\.log', 'tokens');
     % index + 1 since indices start at 1, not 0 in MATLAB
     n = str2double(num{1}) + 1;
     Wx(:,:,n) = importdata(fullfile(ddir, xfiles(i).name));
 end
 
 for i=1:ny
-    num = regexp(yfiles(i).name, 'weights_y_in_(\d+)_.*\.log', 'tokens');
+    num = regexp(yfiles(i).name, 'weights_y_in_(\d+).*\.log', 'tokens');
     % index + 1 since indices start at 1, not 0 in MATLAB
     n = str2double(num{1}) + 1;
     Wy(:,:,n) = importdata(fullfile(ddir, yfiles(i).name));
