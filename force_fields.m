@@ -65,7 +65,7 @@ oMovement = (populationMin:interval:populationMax)';
 time = Wx(:,1,1);
 T = length(time);
 
-figure;
+figure(1);
 
 % plot movements for each of the neurons
 for i=1:nx
@@ -97,7 +97,7 @@ vid.Quality = videoQuality;
 vid.FrameRate = videoFPS;
 open(vid);
 
-figure;
+figure(2);
 
 for t=1:T
     dx = zeros(nx, 1);
@@ -126,7 +126,7 @@ for t=1:T
     quiver(dx,dy);
     axis square;
     axis([0,nCols+1,0,nRows+1]);
-    f = getframe(gcf);
+    f = getframe(2);
     writeVideo(vid, f);
     pause(1/4);
 end
