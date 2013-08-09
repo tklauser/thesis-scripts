@@ -36,7 +36,10 @@ ny = length(yfiles);
 
 % assume number of neurons equal for x and y, otherwise the
 % rest of the script won't work
-if nx == 0 || ny == 0 || nx ~= ny
+if nx == 0 || ny == 0 || nx ~= nInputs || nx ~= ny
+    disp('There is something wrong with your data directory:');
+    disp(sprintf('# of files for x: %d', nx));
+    disp(sprintf('# of files for y: %d', ny));
     return
 end
 
