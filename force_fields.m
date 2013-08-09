@@ -29,12 +29,12 @@ end
 if exist(fullfile(ddir, 'params.log'), 'file') == 2
     params = importdata(fullfile(ddir, 'params.log'), ',', 1);
     % only use complete parameter set
-    if length(params.data) == 8
+    if length(params.data) >= 7
         pCells = num2cell(params.data);
         % first entry is time, because of the file format -> ignore
         [~, nRows, nCols, nOutputs, ...
             populationMinX, populationMaxX, ...
-            populationMinY, populationMaxY] = pCells{:};
+            populationMinY, populationMaxY] = pCells{1:7};
     end
 end
 
