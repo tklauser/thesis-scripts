@@ -152,7 +152,7 @@ for t=1:T
 
     f = getframe(2);
     writeVideo(vid, f);
-    pause(1/4);
+    %pause(1/4);
 
     if step == 1
         ret = input('Select action: [s]tep, [c]ontinue, [q]uit: ', 's');
