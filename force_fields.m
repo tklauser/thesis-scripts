@@ -114,6 +114,8 @@ open(vid);
 
 figure(2);
 
+step = 1;
+
 for t=1:T
     dx = zeros(nx, 1);
     dy = zeros(nx, 1);    
@@ -146,6 +148,19 @@ for t=1:T
     f = getframe(2);
     writeVideo(vid, f);
     pause(1/4);
+
+    if step == 1
+        ret = input('Select action: [s]tep, [c]ontinue, [q]uit: ', 's');
+        if ret == 's'
+            step = 1;
+        elseif ret == 'c'
+            step = 0;
+        elseif ret == 'q'
+            return
+        else
+            disp('invalid input');
+        end
+    end
 end
 
 close(vid);
