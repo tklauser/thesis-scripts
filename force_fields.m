@@ -102,6 +102,7 @@ for i=1:nx
 
     subplot(ceil(nx/plot_cols), plot_cols, i);
     plot([movex movey]);
+    title(sprintf('neuron %d', i - 1));
 end
 
 % prepare video creation
@@ -140,6 +141,8 @@ for t=1:T
     quiver(dx,dy);
     axis square;
     axis([0,nCols+1,0,nRows+1]);
+    title(sprintf('step %d (t=%f)', t, Wx(t,1,1)));
+
     f = getframe(2);
     writeVideo(vid, f);
     pause(1/4);
