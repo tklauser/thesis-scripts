@@ -5,7 +5,7 @@ function force_fields(ddir)
 
 videoQuality = 100;
 videoFPS = 4;
-plot_cols = 5;            % number of columns in the plot
+plot_cols = 5;              % number of columns in the plot
 
 % experiment default values, can be overriden by params.log
 nRows = 5;                  % rows of the input image
@@ -34,7 +34,7 @@ if exist(fullfile(ddir, 'params.log'), 'file') == 2
         % first entry is time, because of the file format -> ignore
         [~, nRows, nCols, nOutputs, ...
             populationMinX, populationMaxX, ...
-            populationMinY, populationMaxY] = pCells{1:7};
+            populationMinY, populationMaxY] = pCells{1:8};
     end
 end
 
