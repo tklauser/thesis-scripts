@@ -147,8 +147,8 @@ for t=1:T
     axis([0,nCols+1,0,nRows+1]);
     title(sprintf('step %d (t=%f)', t, Wx(t,1,1)));
 
-    dideal(t,1) = sum(sum(dx - idealx));
-    dideal(t,2) = sum(sum(dy - idealy));
+    dideal(t,1) = sum(sum(abs(dx - idealx)));
+    dideal(t,2) = sum(sum(abs(dy - idealy)));
 
     f = getframe(2);
     writeVideo(vid, f);
