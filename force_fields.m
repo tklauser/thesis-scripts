@@ -120,27 +120,27 @@ dideal = zeros(T,2);
 
 for t=1:T
     dx = zeros(nx, 1);
-    dy = zeros(nx, 1);    
-    
+    dy = zeros(nx, 1);
+
     for i=1:nx
         wxt = Wx(t,2:end,i);
         wyt = Wy(t,2:end,i);
-        
+
         oTotalX = sum(wxt);
         oTotalY = sum(wyt);
-        
+
         dx(i) = wxt * oMovementX ./ oTotalX;
         dy(i) = wyt * oMovementY ./ oTotalY;
     end
 
     dx = reshape(dx, nRows, nCols);
     dy = reshape(dy, nRows, nCols);
-    
+
     % flip up to down since 0,0 is the input neuron for the upper left
     % corner
     dx = flipud(dx);
     dy = flipud(dy);
-    
+
     % for each time step build up a quiver plot
     quiver(dx,dy);
     axis square;
