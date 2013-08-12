@@ -115,6 +115,8 @@ open(vid);
 figure(2);
 
 step = 1;
+[idealx,idealy] = ideal_force_field(-2,2,-2,2);
+dideal = zeros(T,2);
 
 for t=1:T
     dx = zeros(nx, 1);
@@ -145,6 +147,9 @@ for t=1:T
     axis([0,nCols+1,0,nRows+1]);
     title(sprintf('step %d (t=%f)', t, Wx(t,1,1)));
 
+    dideal(t,1) = sum(sum(dx - idealx));
+    dideal(t,2) = sum(sum(dy - idealy));
+
     f = getframe(2);
     writeVideo(vid, f);
     pause(1/4);
@@ -164,5 +169,10 @@ for t=1:T
 end
 
 close(vid);
+
+figure(3);
+plot(dideal);
+legend('x dimension', 'y dimension');
+title('cum. diff. of actual force field to ideal force field');
 
 end % function force_fields()
