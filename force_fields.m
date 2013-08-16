@@ -27,14 +27,14 @@ end
 
 % if we have a file specifying the parameters, use them from there
 if exist(fullfile(ddir, 'params.log'), 'file') == 2
-    params = importdata(fullfile(ddir, 'params.log'), ',', 1);
+    params = dlmread(fullfile(ddir, 'params.log'), ',', 1, 0);
     % only use complete parameter set
-    if length(params.data) >= 7
-        pCells = num2cell(params.data);
+    if length(params) >= 8
+        p = num2cell(params);
         % first entry is time, because of the file format -> ignore
         [~, nRows, nCols, nOutputs, ...
             populationMinX, populationMaxX, ...
-            populationMinY, populationMaxY] = pCells{1:8};
+            populationMinY, populationMaxY] = p{1:8}
     end
 end
 
@@ -61,14 +61,14 @@ for i=1:nx
     num = regexp(xfiles(i).name, 'weights_x_in_(\d+).*\.log', 'tokens');
     % index + 1 since indices start at 1, not 0 in MATLAB
     n = str2double(num{1}) + 1;
-    Wx(:,:,n) = importdata(fullfile(ddir, xfiles(i).name));
+    Wx(:,:,n) = load(fullfile(ddir, xfiles(i).name));
 end
 
 for i=1:ny
     num = regexp(yfiles(i).name, 'weights_y_in_(\d+).*\.log', 'tokens');
     % index + 1 since indices start at 1, not 0 in MATLAB
     n = str2double(num{1}) + 1;
-    Wy(:,:,n) = importdata(fullfile(ddir, yfiles(i).name));
+    Wy(:,:,n) = load(fullfile(ddir, yfiles(i).name));
 end
 
 intervalX = (populationMaxX - populationMinX) / (nOutputs - 1);
