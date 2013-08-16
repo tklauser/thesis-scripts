@@ -117,6 +117,7 @@ figure(2);
 step = 1;
 [idealx,idealy] = ideal_force_field(-2,2,-2,2);
 dideal = zeros(T,2);
+dirideal = zeros(T,2);
 
 for t=1:T
     dx = zeros(nx, 1);
@@ -153,6 +154,10 @@ for t=1:T
     dideal(t,1) = sum(sum(abs(dx - idealx)));
     dideal(t,2) = sum(sum(abs(dy - idealy)));
 
+    % compare direction to ideal direction
+    dirideal(t,1) = sum(sum(sign(dx) == sign(idealx)));
+    dirideal(t,2) = sum(sum(sign(dy) == sign(idealy)));    
+    
     f = getframe(2);
     writeVideo(vid, f);
     %pause(1/4);
@@ -173,9 +178,20 @@ end
 
 close(vid);
 
+dx
+dy
+idealx
+idealy
+
 figure(3);
 plot(dideal);
 legend('x dimension', 'y dimension');
 title('cum. diff. of actual force field to ideal force field');
+
+figure(4)
+plot(dirideal);
+axis([0,T,0,nInputs]);
+legend('x dimension', 'y dimension');
+title('# of vectors with correct direction in x/y');
 
 end % function force_fields()
