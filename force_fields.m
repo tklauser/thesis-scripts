@@ -133,12 +133,15 @@ for t=1:T
         dy(i) = wyt * oMovementY ./ oTotalY;
     end
 
+    % convert to matrix
     dx = reshape(dx, nRows, nCols);
     dy = reshape(dy, nRows, nCols);
-
+    % correct order row <-> columns
+    dx = dx';
+    dy = dy';
     % flip up to down since 0,0 is the input neuron for the upper left
-    % corner
-    dx = flipud(dx);
+    % corner. Invert x since positive value means movement to the left.
+    dx = flipud(dx) * (-1.0);
     dy = flipud(dy);
 
     % for each time step build up a quiver plot
