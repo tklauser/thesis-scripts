@@ -1,5 +1,5 @@
 % Quiver plot of the development of weights over time
-function force_fields(ddir)
+function [dx,dy] = force_fields(ddir)
 
 % parameters
 
@@ -34,7 +34,7 @@ if exist(fullfile(ddir, 'params.log'), 'file') == 2
         % first entry is time, because of the file format -> ignore
         [~, nRows, nCols, nOutputs, ...
             populationMinX, populationMaxX, ...
-            populationMinY, populationMaxY] = p{1:8}
+            populationMinY, populationMaxY] = p{1:8};
     end
 end
 
@@ -115,7 +115,7 @@ open(vid);
 figure(2);
 
 step = 1;
-[idealx,idealy] = ideal_force_field(-2,2,-2,2);
+[idealx,idealy] = ideal_force_field(-2,2,-2,2,nRows,nCols);
 dideal = zeros(T,2);
 dirideal = zeros(T,2);
 
@@ -177,11 +177,6 @@ for t=1:T
 end
 
 close(vid);
-
-dx
-dy
-idealx
-idealy
 
 figure(3);
 plot(dideal);
