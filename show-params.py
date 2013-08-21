@@ -46,12 +46,9 @@ def show_params(d, params_file, recursive):
         print("number of labels doesn't correspond to number of values in {}".format(p))
         return
 
-    # create dictionary with labels as indices
-    params = dict(zip(labels, values))
-
     print("experiment {}".format(d))
-    for k, v in params.items():
-        print("  {:<25}: {}".format(k, v))
+    for i, l in enumerate(labels):
+        print("  {:<25}: {}".format(l, values[i]))
     print("")
 
 def main():
