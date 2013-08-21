@@ -8,6 +8,18 @@
 import getopt
 import os, sys
 
+LEARNING_RULES = {
+        0: 'Oja',
+        1: 'Hebbian Covariance',
+        2: 'McMillen',
+        3: 'Learning by Mistakes',
+}
+
+OUTPUT_FUNCTIONS = {
+        0: 'linear',
+        1: 'sigmoid',
+}
+
 def usage():
     print("""usage: {} [OPTION...] DIRECTORY...
 
@@ -47,8 +59,23 @@ def show_params(d, params_file, recursive):
         return
 
     print("experiment {}".format(d))
+    linear = False
     for i, l in enumerate(labels):
-        print("  {:<25}: {}".format(l, values[i]))
+        if l == 'time':
+            continue
+        elif l == 'learningRule':
+            v = LEARNING_RULES[int(values[i])]
+        elif l == 'outputFn':
+            v = OUTPUT_FUNCTIONS[int(values[i])]
+            if v == 'linear':
+                linear = True
+        else:
+            v = values[i]
+
+        if l == 'sigmoidBeta' and linear:
+            continue
+
+        print("  {:<25}: {}".format(l, v))
     print("")
 
 def main():
