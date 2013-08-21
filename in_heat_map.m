@@ -7,8 +7,6 @@ if nargin < 1
         disp('User canceled function');
         return
     end
-elseif nargin < 2
-    
 end
 
 % if we have a file specifying the parameters, use them from there
