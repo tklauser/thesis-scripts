@@ -156,8 +156,8 @@ for t=1:T
 
     % compare direction to ideal direction
     dirideal(t,1) = sum(sum(sign(dx) == sign(idealx)));
-    dirideal(t,2) = sum(sum(sign(dy) == sign(idealy)));    
-    
+    dirideal(t,2) = sum(sum(sign(dy) == sign(idealy)));
+
     f = getframe(2);
     writeVideo(vid, f);
     %pause(1/4);
