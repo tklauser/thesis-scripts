@@ -139,6 +139,7 @@ def force_fields(ddir, ts):
         [x, y] = np.meshgrid(np.arange(1, nRows + 1), np.arange(1, nCols + 1))
         Q = plt.quiver(x, y, dx, dy, units='width', width=0.005, color='b')
         plt.axis([0, nCols + 1, 0, nRows + 1])
+        plt.axes().set_aspect('equal', 'box')
         plt.title("step {} (t={})".format(t, time[t]))
 
     plt.show()
