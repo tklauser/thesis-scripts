@@ -28,7 +28,7 @@ in = in(:,2:end);
 
 for t=2:T
     tin = in(1:t,:);
-    
+
     % sum up per column
     incount = sum(tin);
     incount = reshape(incount,nRows,nCols)';
