@@ -10,7 +10,6 @@ plot_cols = 5;              % number of columns in the plot
 % experiment default values, can be overriden by params.log
 nRows = 5;                  % rows of the input image
 nCols = 5;                  % columns of the input image
-nInputs = nRows * nCols;    % number of neurons in the input layer
 nOutputs = 10;              % number of neurons in the output layer
 populationMinX = -20.0;     % min (left) X value of population coding
 populationMaxX = 20;        % max (right) X value of population coding
@@ -38,6 +37,8 @@ if exist(fullfile(ddir, 'params.log'), 'file') == 2
     end
 end
 
+nInputs = nRows * nCols;    % number of neurons in the input layer
+
 % take date from directory name
 [~, date, ~] = fileparts(ddir);
 
@@ -52,6 +53,7 @@ if nx == 0 || ny == 0 || nx ~= nInputs || nx ~= ny
     disp('There is something wrong with your data directory:');
     disp(sprintf('# of files for x: %d', nx));
     disp(sprintf('# of files for y: %d', ny));
+    disp(sprintf('# of inputs: %d', nInputs));
     return
 end
 
