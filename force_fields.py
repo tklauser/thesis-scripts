@@ -142,6 +142,7 @@ def force_fields(ddir, ts):
         plt.axes().set_aspect('equal', 'box')
         plt.title("step {} (t={})".format(t, time[t]))
 
+    plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=150, bbox_inches='tight')
     plt.show()
 
 def main():

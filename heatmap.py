@@ -90,7 +90,9 @@ def heatmap(ddir, ts, cmap):
         ax.set_aspect('equal', 'box')
         ax.set_title("time step {}".format(t, time[t]))
 
+    plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=150, bbox_inches='tight')
     plt.show()
+
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "c:t:h")
