@@ -15,12 +15,13 @@ By default the plot is shown for the first and last time step.
 
 options:
 
+  -c CMAP     use CMAP als colormap, see help(colormaps) in matplotlib for a list
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def heatmap(ddir, ts):
+def heatmap(ddir, ts, cmap):
     # TODO: move directory checking and parameter reading into class used by
     # this script and force_fields.py
     if not os.path.isdir(ddir):
@@ -81,15 +82,18 @@ def heatmap(ddir, ts):
         s = '1' + str(len(ts)) + str(i + 1)
         ax = fig.add_subplot(int(s))
 
+        # set the default colormap to gray
+        if cmap != None:
+            plt.set_cmap(cmap)
         p = ax.pcolormesh(x, y, incount)
-        ax.set_aspect('equal')
-        fig.colorbar(p, ax=ax, shrink=0.35, pad=0.1, aspect=10)
+#        fig.colorbar(p, ax=ax, shrink=0.35, pad=0.1, aspect=10)
+        ax.set_aspect('equal', 'box')
         ax.set_title("time step {}".format(t, time[t]))
 
     plt.show()
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:h")
+        opts, args = getopt.getopt(sys.argv[1:], "c:t:h")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -99,11 +103,14 @@ def main():
         usage()
         sys.exit(-1)
 
+    gray = False
     # show last timestep by default
     ts = [-1]
 
     for o, a in opts:
-        if o == '-t':
+        if o == '-c':
+            cm = a
+        elif o == '-t':
             ts = a.split(',')
             if len(ts) < 1:
                 print("invalid timestep specification: {}".format(a))
@@ -114,7 +121,7 @@ def main():
         else:
             assert False, "unhandled option"
 
-    heatmap(args[0], np.array(ts, np.int32))
+    heatmap(args[0], np.array(ts, np.int32), cm)
 
 if __name__ == '__main__':
     main()
