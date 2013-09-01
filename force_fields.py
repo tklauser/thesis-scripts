@@ -102,11 +102,12 @@ def force_fields(ddir, ts):
 
     time = Wx[:,0,0]
     T = len(time)
+    [x, y] = np.meshgrid(np.arange(1, nRows + 1), np.arange(1, nCols + 1))
 
     for t in ts:
         # use negative indices as in python
         if t < 0:
-            t = T + t 
+            t = T + t
 
         if t >= T:
             t = T - 1
@@ -136,7 +137,6 @@ def force_fields(ddir, ts):
         dx = np.flipud(dx) * (-1.0)
         dy = np.flipud(dy)
 
-        [x, y] = np.meshgrid(np.arange(1, nRows + 1), np.arange(1, nCols + 1))
         Q = plt.quiver(x, y, dx, dy, units='width', width=0.005, color='b')
         plt.axis([0, nCols + 1, 0, nRows + 1])
         plt.axes().set_aspect('equal', 'box')
