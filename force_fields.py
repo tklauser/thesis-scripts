@@ -104,7 +104,9 @@ def force_fields(ddir, ts):
     T = len(time)
     [x, y] = np.meshgrid(np.arange(1, nRows + 1), np.arange(1, nCols + 1))
 
-    for t in ts:
+    fig = plt.figure()
+
+    for i, t in enumerate(ts):
         # use negative indices as in python
         if t < 0:
             t = T + t
@@ -114,20 +116,18 @@ def force_fields(ddir, ts):
         elif t < 0:
             t = 0
 
-        plt.figure()
-
         dx = np.zeros([nx, 1])
         dy = np.zeros([ny, 1])
 
-        for i in range(nx):
-            wxt = Wx[t,1:,i]
-            wyt = Wy[t,1:,i]
+        for n in range(nx):
+            wxt = Wx[t,1:,n]
+            wyt = Wy[t,1:,n]
 
             oTotalX = wxt.sum()
             oTotalY = wyt.sum()
 
-            dx[i] = np.dot(wxt, oMovementX) / oTotalX
-            dy[i] = np.dot(wyt, oMovementY) / oTotalY
+            dx[n] = np.dot(wxt, oMovementX) / oTotalX
+            dy[n] = np.dot(wyt, oMovementY) / oTotalY
 
         # convert to matrix
         dx = dx.reshape(nRows, nCols)
@@ -137,10 +137,13 @@ def force_fields(ddir, ts):
         dx = np.flipud(dx) * (-1.0)
         dy = np.flipud(dy)
 
-        Q = plt.quiver(x, y, dx, dy, units='width', width=0.005, color='b')
-        plt.axis([0, nCols + 1, 0, nRows + 1])
-        plt.axes().set_aspect('equal', 'box')
-        plt.title("step {} (t={})".format(t, time[t]))
+        s = '1' + str(len(ts)) + str(i + 1)
+        ax = fig.add_subplot(int(s))
+
+        Q = ax.quiver(x, y, dx, dy, units='width', width=0.005, color='b')
+        ax.axis([0, nCols + 1, 0, nRows + 1])
+        ax.set_aspect('equal', 'box')
+        ax.set_title("step {} (t={})".format(t, time[t]))
 
     plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=150, bbox_inches='tight')
     plt.show()
