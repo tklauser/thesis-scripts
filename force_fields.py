@@ -19,10 +19,11 @@ options:
 
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
+  -q          quiet mode, don't show plot, only write PDF
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def force_fields(ddir, ts):
+def force_fields(ddir, ts, quiet):
     if not os.path.isdir(ddir):
         print("{} is not a directory".format(ddir))
         return
@@ -145,12 +146,13 @@ def force_fields(ddir, ts):
         ax.set_aspect('equal', 'box')
         ax.set_title("step {} (t={})".format(t, time[t]))
 
-    plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=150, bbox_inches='tight')
-    plt.show()
+    plt.savefig(os.path.join(ddir, 'force_field.pdf'), dpi=300, bbox_inches='tight', pad_inches=0.2)
+    if not quiet:
+        plt.show()
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:h")
+        opts, args = getopt.getopt(sys.argv[1:], "t:qh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -162,6 +164,7 @@ def main():
 
     # show first and last timestep by default
     ts = [0, -1]
+    quiet = False
 
     for o, a in opts:
         if o == '-t':
@@ -169,13 +172,15 @@ def main():
             if len(ts) < 1:
                 print("invalid timestep specification: {}".format(a))
                 sys.exit(-1)
+        elif o == '-q':
+            quiet = True
         elif o == '-h':
             usage()
             sys.exit(0)
         else:
             assert False, "unhandled option"
 
-    force_fields(args[0], np.array(ts, np.int32))
+    force_fields(args[0], np.array(ts, np.int32), quiet)
 
 if __name__ == '__main__':
     main()
