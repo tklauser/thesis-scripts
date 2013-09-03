@@ -88,9 +88,17 @@ def heatmap(ddir, ts, cmap):
         p = ax.pcolormesh(x, y, incount)
 #        fig.colorbar(p, ax=ax, shrink=0.35, pad=0.1, aspect=10)
         ax.set_aspect('equal', 'box')
-        ax.set_title("time step {}".format(t, time[t]))
+        ax.set_xticks(np.arange(0.5, nCols + 0.5, 2))
+        ax.set_xticklabels(np.arange(0, nCols + 1, 2), fontsize=10)
+        ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='on')
+        ax.set_yticks(np.arange(0.5, nRows + 0.5, 2))
+        ax.set_yticklabels(np.arange(0, nRows + 1, 2), fontsize=10)
+        ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='on')
+        ax.set_xlim(0, nCols)
+        ax.set_ylim(0, nRows)
+        ax.set_title("time step {}".format(t, time[t]), fontsize=12)
 
-    plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=150, bbox_inches='tight')
+    plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=300, bbox_inches='tight', pad_inches=0.15)
     plt.show()
 
 def main():
@@ -105,7 +113,7 @@ def main():
         usage()
         sys.exit(-1)
 
-    gray = False
+    cm = None
     # show last timestep by default
     ts = [-1]
 
