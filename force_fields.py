@@ -141,12 +141,16 @@ def force_fields(ddir, ts, quiet):
         s = '1' + str(len(ts)) + str(i + 1)
         ax = fig.add_subplot(int(s))
 
-        Q = ax.quiver(x, y, dx, dy, units='width', width=0.005, color='b')
+        Q = ax.quiver(x, y, dx, dy, units='width', width=0.0035, color='b', edgecolors=('b'))
         ax.axis([0, nCols + 1, 0, nRows + 1])
+        ax.set_xticks(np.arange(1, nCols + 1, 2))
+        ax.set_xticklabels(np.arange(0, nCols, 2), fontsize=6)
+        ax.set_yticks(np.arange(1, nRows + 1, 2))
+        ax.set_yticklabels(np.arange(0, nRows, 2), fontsize=6)
         ax.set_aspect('equal', 'box')
-        ax.set_title("step {} (t={})".format(t, time[t]))
+        ax.set_title("time step {}".format(t), fontsize=10)
 
-    plt.savefig(os.path.join(ddir, 'force_field.pdf'), dpi=300, bbox_inches='tight', pad_inches=0.2)
+    plt.savefig(os.path.join(ddir, 'force_field.pdf'), dpi=300, bbox_inches='tight', pad_inches=0.15)
     if not quiet:
         plt.show()
 
