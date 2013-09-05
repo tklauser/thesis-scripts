@@ -144,11 +144,11 @@ def force_fields(ddir, ts, quiet):
         Q = ax.quiver(x, y, dx, dy, units='width', width=0.0035, color='b', edgecolors=('b'))
         ax.axis([0, nCols + 1, 0, nRows + 1])
         ax.set_xticks(np.arange(1, nCols + 1, 2))
-        ax.set_xticklabels(np.arange(0, nCols, 2), fontsize=6)
+        ax.set_xticklabels(np.arange(0, nCols, 2), fontsize=8)
         ax.set_yticks(np.arange(1, nRows + 1, 2))
-        ax.set_yticklabels(np.arange(0, nRows, 2), fontsize=6)
+        ax.set_yticklabels(np.arange(0, nRows, 2), fontsize=8)
         ax.set_aspect('equal', 'box')
-        ax.set_title("time step {}".format(t), fontsize=10)
+        ax.set_title("time step {}".format(t), fontsize=12)
 
     plt.savefig(os.path.join(ddir, 'force_field.pdf'), dpi=300, bbox_inches='tight', pad_inches=0.15)
     if not quiet:
