@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def usage():
-    print("""usage: {} [OPTION...] DIRECTORY
+    print("""usage: {} [OPTION...] DIRECTORY...
 
 Show quiver plot of the development of weights over time.
 
@@ -184,7 +184,8 @@ def main():
         else:
             assert False, "unhandled option"
 
-    force_fields(args[0], np.array(ts, np.int32), quiet)
+    for arg in args:
+        force_fields(arg, np.array(ts, np.int32), subplot, quiet)
 
 if __name__ == '__main__':
     main()
