@@ -66,6 +66,12 @@ def heatmap(ddir, ts, cmap, quiet):
 
     fig = plt.figure()
 
+    # set the colormap
+    if cmap != None:
+        cmap = plt.get_cmap(cmap)
+    else:
+        cmap = plt.get_cmap('bone')
+
     for i, t in enumerate(ts):
         # use negative indices as in python
         if t < 0:
@@ -83,17 +89,16 @@ def heatmap(ddir, ts, cmap, quiet):
         s = '1' + str(len(ts)) + str(i + 1)
         ax = fig.add_subplot(int(s))
 
-        # set the default colormap to gray
-        if cmap != None:
-            plt.set_cmap(cmap)
-        p = ax.pcolormesh(x, y, incount)
-#        fig.colorbar(p, ax=ax, shrink=0.35, pad=0.1, aspect=10)
+        p = ax.pcolormesh(x, y, incount, cmap=cmap, rasterized=True)
+
+#        cb = fig.colorbar(p, ax=ax, shrink=0.35, pad=0.2, aspect=10)
+#        cb.set_label('# of stimulations')
         ax.set_aspect('equal', 'box')
         ax.set_xticks(np.arange(0.5, nCols + 0.5, 2))
-        ax.set_xticklabels(np.arange(0, nCols + 1, 2), fontsize=10)
+        ax.set_xticklabels(np.arange(0, nCols + 1, 2), fontsize=8)
         ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='on')
         ax.set_yticks(np.arange(0.5, nRows + 0.5, 2))
-        ax.set_yticklabels(np.arange(0, nRows + 1, 2), fontsize=10)
+        ax.set_yticklabels(np.arange(0, nRows + 1, 2), fontsize=8)
         ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='on')
         ax.set_xlim(0, nCols)
         ax.set_ylim(0, nRows)
