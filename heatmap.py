@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def usage():
-    print("""usage: {} [OPTION...] DIRECTORY
+    print("""usage: {} [OPTION...] DIRECTORY...
 
 Show heat map plot of the number of times an input field has been activated
 
@@ -18,10 +18,11 @@ options:
   -c CMAP     use CMAP als colormap, see help(colormaps) in matplotlib for a list
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
+  -q          quiet mode, don't show plot, only write PDF
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def heatmap(ddir, ts, cmap):
+def heatmap(ddir, ts, cmap, quiet):
     # TODO: move directory checking and parameter reading into class used by
     # this script and force_fields.py
     if not os.path.isdir(ddir):
@@ -99,11 +100,12 @@ def heatmap(ddir, ts, cmap):
         ax.set_title("time step {}".format(t, time[t]), fontsize=12)
 
     plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=300, bbox_inches='tight', pad_inches=0.15)
-    plt.show()
+    if not quiet:
+        plt.show()
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "c:t:h")
+        opts, args = getopt.getopt(sys.argv[1:], "c:t:qh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -116,6 +118,7 @@ def main():
     cm = None
     # show last timestep by default
     ts = [-1]
+    quiet = False
 
     for o, a in opts:
         if o == '-c':
@@ -125,13 +128,16 @@ def main():
             if len(ts) < 1:
                 print("invalid timestep specification: {}".format(a))
                 sys.exit(-1)
+        elif o == '-q':
+            quiet = True
         elif o == '-h':
             usage()
             sys.exit(0)
         else:
             assert False, "unhandled option"
 
-    heatmap(args[0], np.array(ts, np.int32), cm)
+    for arg in args:
+        heatmap(arg, np.array(ts, np.int32), cm, quiet)
 
 if __name__ == '__main__':
     main()
