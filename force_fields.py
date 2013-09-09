@@ -19,6 +19,7 @@ options:
 
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
+  -s SUBPLOT  specify subplot layout (in matplotlib style, e.g. 23 for 2 rows/3 columns)
   -q          quiet mode, don't show plot, only write PDF
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
