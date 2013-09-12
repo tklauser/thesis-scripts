@@ -18,11 +18,12 @@ options:
   -c CMAP     use CMAP als colormap, see help(colormaps) in matplotlib for a list
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
+  -s SUBPLOT  specify subplot layout (in matplotlib style, e.g. 23 for 2 rows/3 columns)
   -q          quiet mode, don't show plot, only write PDF
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def heatmap(ddir, ts, cmap, quiet):
+def heatmap(ddir, ts, cmap, subplot, quiet):
     # TODO: move directory checking and parameter reading into class used by
     # this script and force_fields.py
     if not os.path.isdir(ddir):
@@ -70,7 +71,7 @@ def heatmap(ddir, ts, cmap, quiet):
     if cmap != None:
         cmap = plt.get_cmap(cmap)
     else:
-        cmap = plt.get_cmap('bone')
+        cmap = plt.get_cmap('gray_r')
 
     for i, t in enumerate(ts):
         # use negative indices as in python
@@ -86,7 +87,11 @@ def heatmap(ddir, ts, cmap, quiet):
         incount = incount.reshape(nRows,nCols)
         incount = np.flipud(incount)
 
-        s = '1' + str(len(ts)) + str(i + 1)
+        if not subplot is None:
+            s = subplot + str(i + 1)
+        else:
+            s = '1' + str(len(ts)) + str(i + 1)
+
         ax = fig.add_subplot(int(s))
 
         p = ax.pcolormesh(x, y, incount, cmap=cmap, rasterized=True)
@@ -110,7 +115,7 @@ def heatmap(ddir, ts, cmap, quiet):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "c:t:qh")
+        opts, args = getopt.getopt(sys.argv[1:], "c:t:s:qh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -123,6 +128,7 @@ def main():
     cm = None
     # show last timestep by default
     ts = [-1]
+    subplot = None
     quiet = False
 
     for o, a in opts:
@@ -133,6 +139,8 @@ def main():
             if len(ts) < 1:
                 print("invalid timestep specification: {}".format(a))
                 sys.exit(-1)
+        elif o == '-s':
+            subplot = a
         elif o == '-q':
             quiet = True
         elif o == '-h':
@@ -142,7 +150,7 @@ def main():
             assert False, "unhandled option"
 
     for arg in args:
-        heatmap(arg, np.array(ts, np.int32), cm, quiet)
+        heatmap(arg, np.array(ts, np.int32), cm, subplot, quiet)
 
 if __name__ == '__main__':
     main()
