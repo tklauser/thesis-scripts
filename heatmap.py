@@ -109,6 +109,7 @@ def heatmap(ddir, ts, cmap, subplot, quiet):
         ax.set_ylim(0, nRows)
         ax.set_title("time step {}".format(t, time[t]), fontsize=12)
 
+    fig.suptitle(ddir)
     plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=300, bbox_inches='tight', pad_inches=0.15)
     if not quiet:
         plt.show()

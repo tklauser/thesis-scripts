@@ -155,6 +155,7 @@ def force_fields(ddir, ts, subplot, quiet):
         ax.set_aspect('equal', 'box')
         ax.set_title("time step {}".format(t), fontsize=12)
 
+    fig.suptitle(ddir)
     plt.tight_layout()
     plt.subplots_adjust(left=0.125, bottom=0.1, right=0.7, top=0.9,
                             wspace=0.2, hspace=0.3)
