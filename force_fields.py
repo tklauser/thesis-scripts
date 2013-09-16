@@ -20,11 +20,12 @@ options:
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
   -s SUBPLOT  specify subplot layout (in matplotlib style, e.g. 23 for 2 rows/3 columns)
+  -T          show experiment path in figure title
   -q          quiet mode, don't show plot, only write PDF
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def force_fields(ddir, ts, subplot, quiet):
+def force_fields(ddir, ts, subplot, quiet, show_title):
     if not os.path.isdir(ddir):
         print("{} is not a directory".format(ddir))
         return
@@ -155,7 +156,8 @@ def force_fields(ddir, ts, subplot, quiet):
         ax.set_aspect('equal', 'box')
         ax.set_title("time step {}".format(t), fontsize=12)
 
-    fig.suptitle(ddir)
+    if show_title:
+        fig.suptitle(ddir)
     plt.tight_layout()
     plt.subplots_adjust(left=0.125, bottom=0.1, right=0.7, top=0.9,
                             wspace=0.2, hspace=0.3)
@@ -166,7 +168,7 @@ def force_fields(ddir, ts, subplot, quiet):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:s:qh")
+        opts, args = getopt.getopt(sys.argv[1:], "t:s:Tqh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -179,6 +181,7 @@ def main():
     # show first and last timestep by default
     ts = [0, -1]
     subplot = None
+    show_title = False
     quiet = False
 
     for o, a in opts:
@@ -189,6 +192,8 @@ def main():
                 sys.exit(-1)
         elif o == '-s':
             subplot = a
+        elif o == '-T':
+            show_title = True
         elif o == '-q':
             quiet = True
         elif o == '-h':
@@ -198,7 +203,7 @@ def main():
             assert False, "unhandled option"
 
     for arg in args:
-        force_fields(arg, np.array(ts, np.int32), subplot, quiet)
+        force_fields(arg, np.array(ts, np.int32), subplot, quiet, show_title)
 
 if __name__ == '__main__':
     main()

@@ -19,11 +19,12 @@ options:
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
   -s SUBPLOT  specify subplot layout (in matplotlib style, e.g. 23 for 2 rows/3 columns)
+  -T          show experiment path in figure title
   -q          quiet mode, don't show plot, only write PDF
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def heatmap(ddir, ts, cmap, subplot, quiet):
+def heatmap(ddir, ts, cmap, subplot, quiet, show_title):
     # TODO: move directory checking and parameter reading into class used by
     # this script and force_fields.py
     if not os.path.isdir(ddir):
@@ -109,14 +110,15 @@ def heatmap(ddir, ts, cmap, subplot, quiet):
         ax.set_ylim(0, nRows)
         ax.set_title("time step {}".format(t, time[t]), fontsize=12)
 
-    fig.suptitle(ddir)
+    if show_title:
+        fig.suptitle(ddir)
     plt.savefig(os.path.join(ddir, 'heatmap.pdf'), dpi=300, bbox_inches='tight', pad_inches=0.15)
     if not quiet:
         plt.show()
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "c:t:s:qh")
+        opts, args = getopt.getopt(sys.argv[1:], "c:t:s:Tqh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -130,6 +132,7 @@ def main():
     # show last timestep by default
     ts = [-1]
     subplot = None
+    show_title = False
     quiet = False
 
     for o, a in opts:
@@ -142,6 +145,8 @@ def main():
                 sys.exit(-1)
         elif o == '-s':
             subplot = a
+        elif o == '-T':
+            show_title = True
         elif o == '-q':
             quiet = True
         elif o == '-h':
@@ -151,7 +156,7 @@ def main():
             assert False, "unhandled option"
 
     for arg in args:
-        heatmap(arg, np.array(ts, np.int32), cm, subplot, quiet)
+        heatmap(arg, np.array(ts, np.int32), cm, subplot, quiet, show_title)
 
 if __name__ == '__main__':
     main()
