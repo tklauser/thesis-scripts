@@ -5,6 +5,7 @@ import getopt
 import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
+from params import import_params
 
 def usage():
     print("""usage: {} [OPTION...] DIRECTORY...
@@ -25,39 +26,14 @@ options:
 """.format(os.path.basename(sys.argv[0])))
 
 def heatmap(ddir, ts, cmap, subplot, quiet, show_title):
-    # TODO: move directory checking and parameter reading into class used by
-    # this script and force_fields.py
-    if not os.path.isdir(ddir):
-        print("{} is not a directory".format(ddir))
-        return
+    params = import_params(ddir)
 
-    p = os.path.join(ddir, 'params.log')
-    if not os.path.isfile(p):
-        print("parameter file {} not found".format(p))
-        return
-
-    f = open(p, 'r')
-    labels = f.readline().strip().split(',')
-    values = f.readline().strip().split(',')
-    f.close()
-
-    if len(labels) == 0 or len(values) == 0:
-        print("no parameters found in {}".format(p))
-        return
-
-    if len(labels) != len(values):
-        print("number of labels doesn't correspond to number of values in {}".format(p))
-        return
-
-    # put parameters into a directory, accessable by parameter name
-    params = dict(zip(labels, values))
-
-    if not ('nRowsIn' in params and 'nColsIn' in params):
-        print("not all necessary parameters available in the parameter file")
-        return
-
-    nRows = int(params['nRowsIn'])
-    nCols = int(params['nColsIn'])
+    try:
+        nRows = int(params['nRowsIn'])
+        nCols = int(params['nColsIn'])
+    except KeyError, err:
+        print('necessary parameter not found: ' + str(err))
+        sys.exit(-1)
 
     indata = np.genfromtxt(os.path.join(ddir, 'in.log'), delimiter=',')
 

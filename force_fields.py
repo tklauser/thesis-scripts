@@ -7,6 +7,7 @@ import fnmatch
 import re
 import numpy as np
 import matplotlib.pyplot as plt
+from params import import_params
 
 def usage():
     print("""usage: {} [OPTION...] DIRECTORY...
@@ -26,45 +27,21 @@ options:
 """.format(os.path.basename(sys.argv[0])))
 
 def force_fields(ddir, ts, subplot, quiet, show_title):
-    if not os.path.isdir(ddir):
-        print("{} is not a directory".format(ddir))
-        return
+    params = import_params(ddir)
 
-    p = os.path.join(ddir, 'params.log')
-    if not os.path.isfile(p):
-        print("parameter file {} not found".format(p))
-        return
+    try:
+        nRows = int(params['nRowsIn'])
+        nCols = int(params['nColsIn'])
+        nOutputs = int(params['nOutputs'])
+        popMinX = float(params['popMinX'])
+        popMaxX = float(params['popMaxX'])
+        popMinY = float(params['popMinY'])
+        popMaxY = float(params['popMaxY'])
+    except KeyError, err:
+        print('necessary parameter not found: ' + str(err))
+        sys.exit(-1)
 
-    f = open(p, 'r')
-    labels = f.readline().strip().split(',')
-    values = f.readline().strip().split(',')
-    f.close()
-
-    if len(labels) == 0 or len(values) == 0:
-        print("no parameters found in {}".format(p))
-        return
-
-    if len(labels) != len(values):
-        print("number of labels doesn't correspond to number of values in {}".format(p))
-        return
-
-    # put parameters into a directory, accessable by parameter name
-    params = dict(zip(labels, values))
-
-    if not ('nRowsIn' in params and 'nColsIn' in params and 'nOutputs' in params
-            and 'popMinX' in params and 'popMaxX' in params
-            and 'popMinY' in params and 'popMaxY' in params):
-        print("not all necessary parameters available in the parameter file")
-        return
-
-    nRows = int(params['nRowsIn'])
-    nCols = int(params['nColsIn'])
     nInputs = nRows * nCols
-    nOutputs = int(params['nOutputs'])
-    popMinX = float(params['popMinX'])
-    popMaxX = float(params['popMaxX'])
-    popMinY = float(params['popMinY'])
-    popMaxY = float(params['popMaxY'])
 
     files = os.listdir(ddir)
     xfiles = fnmatch.filter(files, 'weights_x_in*.log')
