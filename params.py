@@ -1,4 +1,11 @@
+# *-* coding: utf-8 -*-
+#
+# show-params.py -- Show drobot experiment parametes in human-readable form
+#
+# Copyright (C) 2013 Tobias Klauser <tklauser@distanz.ch>
+
 import os
+from collections import OrderedDict
 
 def import_params(ddir, pfile='params.log'):
     if not os.path.isdir(ddir):
@@ -24,4 +31,4 @@ def import_params(ddir, pfile='params.log'):
         return None
 
     # put parameters into a directory, accessable by parameter name
-    return dict(zip(labels, values))
+    return OrderedDict(zip(labels, values))

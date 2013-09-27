@@ -7,6 +7,7 @@
 
 import getopt
 import os, sys
+from params import import_params
 
 LEARNING_RULES = {
         0: 'Oja',
@@ -31,9 +32,8 @@ options:
   -h  show this help and exit""".format(os.path.basename(sys.argv[0])))
 
 def show_params(d, params_file, recursive):
-
     if not os.path.isdir(d):
-        return 
+        return
 
     if recursive:
         for dd in os.listdir(d):
@@ -41,36 +41,21 @@ def show_params(d, params_file, recursive):
             if os.path.isdir(dd):
                 show_params(dd, params_file, recursive)
 
-    p = os.path.join(d, params_file)
-    if not os.path.isfile(p):
-        return 
-
-    f = open(p, 'r')
-    labels = f.readline().strip().split(',')
-    values = f.readline().strip().split(',')
-    f.close()
-
-    if len(labels) == 0 or len(values) == 0:
-        print("no parameters found in {}".format(p))
-        return
-
-    if len(labels) != len(values):
-        print("number of labels doesn't correspond to number of values in {}".format(p))
-        return
+    params = import_params(d, params_file)
 
     print("experiment {}".format(d))
     linear = False
-    for i, l in enumerate(labels):
+    for l, v in params.items():
         if l == 'time':
             continue
         elif l == 'learningRule':
-            v = LEARNING_RULES[int(values[i])]
+            v = LEARNING_RULES[int(params[l])]
         elif l == 'outputFn':
-            v = OUTPUT_FUNCTIONS[int(values[i])]
+            v = OUTPUT_FUNCTIONS[int(params[l])]
             if v == 'linear':
                 linear = True
         else:
-            v = values[i]
+            v = params[l]
 
         if l == 'sigmoidBeta' and linear:
             continue
