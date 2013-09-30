@@ -18,6 +18,7 @@ By default the plot is shown for the first and last time step.
 
 options:
 
+  -c          enable continuous animation mode (time and subplot options are ignored)
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
   -s SUBPLOT  specify subplot layout (in matplotlib style, e.g. 23 for 2 rows/3 columns)
@@ -26,7 +27,7 @@ options:
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def force_fields(ddir, ts, subplot, quiet, show_title):
+def force_fields(ddir, ts, continuous, subplot, quiet, show_title):
     params = import_params(ddir)
 
     try:
@@ -84,7 +85,11 @@ def force_fields(ddir, ts, subplot, quiet, show_title):
     T = len(time)
     [x, y] = np.meshgrid(np.arange(1, nRows + 1), np.arange(1, nCols + 1))
 
+    if continuous:
+        ts = range(0, T + 1)
+
     fig = plt.figure()
+    cmap = plt.cm.Blues
 
     for i, t in enumerate(ts):
         # use negative indices as in python
@@ -117,14 +122,23 @@ def force_fields(ddir, ts, subplot, quiet, show_title):
         dx = np.flipud(dx) * (-1.0)
         dy = np.flipud(dy)
 
-        if not subplot is None:
-            s = subplot + str(i + 1)
+        if not continuous:
+            if not subplot is None:
+                s = subplot + str(i + 1)
+            else:
+                s = '1' + str(len(ts)) + str(i + 1)
         else:
-            s = '1' + str(len(ts)) + str(i + 1)
+            s = '111'
 
         ax = fig.add_subplot(int(s))
 
-        Q = ax.quiver(x, y, dx, dy, units='width', width=0.0035, color='b', edgecolors=('b'))
+        c = np.ones((nRows,nCols)) * i
+
+        if not continuous:
+            Q = ax.quiver(x, y, dx, dy, units='width', width=0.0035, color='b', edgecolors=('b'))
+        else:
+            Q = ax.quiver(x, y, dx, dy, units='width', width=0.0035, color=cmap(1.0 * i / T))
+
         ax.axis([0, nCols + 1, 0, nRows + 1])
         ax.set_xticks(np.arange(1, nCols + 1, 2))
         ax.set_xticklabels(np.arange(0, nCols, 2), fontsize=8)
@@ -145,7 +159,7 @@ def force_fields(ddir, ts, subplot, quiet, show_title):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:s:Tqh")
+        opts, args = getopt.getopt(sys.argv[1:], "ct:s:Tqh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -157,12 +171,15 @@ def main():
 
     # show first and last timestep by default
     ts = [0, -1]
+    continuous = False
     subplot = None
     show_title = False
     quiet = False
 
     for o, a in opts:
-        if o == '-t':
+        if o == '-c':
+            continuous = True
+        elif o == '-t':
             ts = a.split(',')
             if len(ts) < 1:
                 print("invalid timestep specification: {}".format(a))
@@ -180,7 +197,7 @@ def main():
             assert False, "unhandled option"
 
     for arg in args:
-        force_fields(arg, np.array(ts, np.int32), subplot, quiet, show_title)
+        force_fields(arg, np.array(ts, np.int32), continuous, subplot, quiet, show_title)
 
 if __name__ == '__main__':
     main()
