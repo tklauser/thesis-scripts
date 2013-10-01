@@ -18,16 +18,17 @@ By default the plot is shown for the first and last time step.
 
 options:
 
-  -c          enable continuous animation mode (time and subplot options are ignored)
+  -c          enable continuous mode (time and subplot options are ignored)
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
   -s SUBPLOT  specify subplot layout (in matplotlib style, e.g. 23 for 2 rows/3 columns)
+  -S STEP     specify time step to use in continous mode
   -T          show experiment path in figure title
   -q          quiet mode, don't show plot, only write PDF
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def force_fields(ddir, ts, continuous, subplot, quiet, show_title):
+def force_fields(ddir, ts, continuous, csteps, subplot, quiet, show_title):
     params = import_params(ddir)
 
     try:
@@ -86,10 +87,10 @@ def force_fields(ddir, ts, continuous, subplot, quiet, show_title):
     [x, y] = np.meshgrid(np.arange(1, nRows + 1), np.arange(1, nCols + 1))
 
     if continuous:
-        ts = range(0, T + 1)
+        ts = range(0, T + 1, csteps)
 
     fig = plt.figure()
-    cmap = plt.cm.Blues
+    cmap = plt.cm.jet
 
     for i, t in enumerate(ts):
         # use negative indices as in python
@@ -137,9 +138,9 @@ def force_fields(ddir, ts, continuous, subplot, quiet, show_title):
         if not continuous:
             Q = ax.quiver(x, y, dx, dy, units='width', width=0.0035, color='b', edgecolors=('b'))
         else:
-            Q = ax.quiver(x, y, dx, dy, units='width', width=0.0035, color=cmap(1.0 * i / T))
+            Q = ax.quiver(x, y, dx, dy, units='width', width=0.0035, color=cmap(float(csteps * i) / T))
 
-        ax.axis([0, nCols + 1, 0, nRows + 1])
+        ax.axis([0.5, nCols + 0.5, 0.5, nRows + 0.5])
         ax.set_xticks(np.arange(1, nCols + 1, 2))
         ax.set_xticklabels(np.arange(0, nCols, 2), fontsize=8)
         ax.set_yticks(np.arange(1, nRows + 1, 2))
@@ -159,7 +160,7 @@ def force_fields(ddir, ts, continuous, subplot, quiet, show_title):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ct:s:Tqh")
+        opts, args = getopt.getopt(sys.argv[1:], "ct:s:S:Tqh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -175,6 +176,7 @@ def main():
     subplot = None
     show_title = False
     quiet = False
+    csteps = 1
 
     for o, a in opts:
         if o == '-c':
@@ -186,6 +188,8 @@ def main():
                 sys.exit(-1)
         elif o == '-s':
             subplot = a
+        elif o == '-S':
+            csteps = int(a)
         elif o == '-T':
             show_title = True
         elif o == '-q':
@@ -197,7 +201,7 @@ def main():
             assert False, "unhandled option"
 
     for arg in args:
-        force_fields(arg, np.array(ts, np.int32), continuous, subplot, quiet, show_title)
+        force_fields(arg, np.array(ts, np.int32), continuous, csteps, subplot, quiet, show_title)
 
 if __name__ == '__main__':
     main()
