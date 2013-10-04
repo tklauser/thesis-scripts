@@ -124,10 +124,10 @@ def force_fields(ddir, ts, continuous, csteps, subplot, quiet, show_title):
         dy = np.flipud(dy)
 
         if not continuous:
-            if not subplot is None:
-                s = subplot + str(i + 1)
-            else:
+            if subplot is None:
                 s = '1' + str(len(ts)) + str(i + 1)
+            else:
+                s = subplot + str(i + 1)
         else:
             s = '111'
 

@@ -64,10 +64,10 @@ def heatmap(ddir, ts, cmap, subplot, quiet, show_title):
         incount = incount.reshape(nRows,nCols)
         incount = np.flipud(incount)
 
-        if not subplot is None:
-            s = subplot + str(i + 1)
-        else:
+        if subplot is None:
             s = '1' + str(len(ts)) + str(i + 1)
+        else:
+            s = subplot + str(i + 1)
 
         ax = fig.add_subplot(int(s))
 
