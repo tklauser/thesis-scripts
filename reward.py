@@ -23,17 +23,19 @@ def reward(ddir, quiet, show_title):
     rewards = np.genfromtxt(os.path.join(ddir, 'reward.log'), delimiter=',')
 
     time = rewards[:,0]
-    T = len(time)
     rewards = rewards[:,1:]
+    T, N = rewards.shape
 
-    r = np.zeros(T)
+    print("N: {}, T: {}".format(N, T))
+
+    t = range(T)
+    r = np.zeros((T,N))
 
     fig = plt.figure()
 
-    for t in range(T):
-        r[t] = rewards[0:t,:].sum(axis=0)
-
-    t = range(len(time))
+    for _t in t:
+        for n in range(N):
+            r[_t,n] = rewards[0:_t,n].sum(axis=0)
 
     plt.plot(t, r)
 
