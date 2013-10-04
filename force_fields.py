@@ -25,10 +25,11 @@ options:
   -S STEP     specify time step to use in continous mode
   -T          show experiment path in figure title
   -q          quiet mode, don't show plot, only write PDF
+  -w          use winner-take-all instead of weighted sum to calculate resulting output
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def force_fields(ddir, ts, continuous, csteps, subplot, quiet, show_title):
+def force_fields(ddir, ts, wta, continuous, csteps, subplot, quiet, show_title):
     params = import_params(ddir)
 
     try:
@@ -90,7 +91,9 @@ def force_fields(ddir, ts, continuous, csteps, subplot, quiet, show_title):
         ts = range(0, T + 1, csteps)
 
     fig = plt.figure()
-    cmap = plt.cm.jet
+#    cmap = plt.cm.jet
+    cmap = plt.cm.Blues
+#    cmap = plt.cm.Reds
 
     for i, t in enumerate(ts):
         # use negative indices as in python
@@ -109,11 +112,18 @@ def force_fields(ddir, ts, continuous, csteps, subplot, quiet, show_title):
             wxt = Wx[t,1:,n]
             wyt = Wy[t,1:,n]
 
-            oTotalX = wxt.sum()
-            oTotalY = wyt.sum()
+            if not wta:
+                oTotalX = wxt.sum()
+                oTotalY = wyt.sum()
 
-            dx[n] = np.dot(wxt, oMovementX) / oTotalX
-            dy[n] = np.dot(wyt, oMovementY) / oTotalY
+                dx[n] = np.dot(wxt, oMovementX) / oTotalX
+                dy[n] = np.dot(wyt, oMovementY) / oTotalY
+            else:
+                amx = np.argmax(wxt)
+                amy = np.argmax(wyt)
+
+                dx[n] = oMovementX[amx]
+                dy[n] = oMovementY[amy]
 
         # convert to matrix
         dx = dx.reshape(nRows, nCols)
@@ -160,7 +170,7 @@ def force_fields(ddir, ts, continuous, csteps, subplot, quiet, show_title):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ct:s:S:Tqh")
+        opts, args = getopt.getopt(sys.argv[1:], "chs:S:t:Tqw")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -173,35 +183,38 @@ def main():
     # show first and last timestep by default
     ts = [0, -1]
     continuous = False
+    csteps = 10
     subplot = None
     show_title = False
     quiet = False
-    csteps = 1
+    wta = False
 
     for o, a in opts:
         if o == '-c':
             continuous = True
+        elif o == '-h':
+            usage()
+            sys.exit(0)
+        elif o == '-s':
+            subplot = a
+        elif o == '-S':
+            csteps = int(a)
         elif o == '-t':
             ts = a.split(',')
             if len(ts) < 1:
                 print("invalid timestep specification: {}".format(a))
                 sys.exit(-1)
-        elif o == '-s':
-            subplot = a
-        elif o == '-S':
-            csteps = int(a)
         elif o == '-T':
             show_title = True
         elif o == '-q':
             quiet = True
-        elif o == '-h':
-            usage()
-            sys.exit(0)
+        elif o == '-w':
+            wta = True
         else:
             assert False, "unhandled option"
 
     for arg in args:
-        force_fields(arg, np.array(ts, np.int32), continuous, csteps, subplot, quiet, show_title)
+        force_fields(arg, np.array(ts, np.int32), wta, continuous, csteps, subplot, quiet, show_title)
 
 if __name__ == '__main__':
     main()
