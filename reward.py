@@ -15,28 +15,50 @@ Show development of reward and cummulative reward.
 options:
 
   -c          show histogram with count of positive and negative rewards
+  -t N,M      only show cummulative reward between time steps N and M
   -T          show experiment path in figure title
   -q          quiet mode, don't show plot, only write PDF
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def reward(ddir, do_count, quiet, show_title):
+def fit_to_range(x, T):
+    # use negative indices as in python
+    if x < 0:
+        x = T + x
+
+    if x < 0:
+        x = 0
+    elif x >= T:
+        x = T - 1
+
+    return x
+
+def reward(ddir, ts, do_count, quiet, show_title):
     rewards = np.genfromtxt(os.path.join(ddir, 'reward.log'), delimiter=',')
 
     time = rewards[:,0]
     rewards = rewards[:,1:]
     T,N = rewards.shape
+    a,b = 0, T
 
-    print("N: {}, T: {}".format(N, T))
+    if len(ts) == 2:
+        a,b = ts
 
-    t = range(T)
+        a = fit_to_range(a, T)
+        b = fit_to_range(b, T)
+
+        t = range(a, b + 1)
+        T = len(t)
+    else:
+        t = range(T)
+
     r = np.zeros((T,N))
 
     fig = plt.figure()
 
     for _t in t:
         for n in range(N):
-            r[_t,n] = rewards[0:_t,n].sum(axis=0)
+            r[_t - a,n] = rewards[0:_t,n].sum(axis=0)
 
     if do_count:
         s = '1' + str(1 + N)
@@ -45,12 +67,16 @@ def reward(ddir, do_count, quiet, show_title):
 
     ax1 = fig.add_subplot(int(s + '1'))
     p = plt.plot(t, r)
-    plt.legend(p, [ "reward #{}".format(n) for n in range(N) ], loc=2)
+    ax1.legend(p, [ "reward #{}".format(n) for n in range(N) ],
+            bbox_to_anchor=(0.5, 1.05), loc='center', borderaxespad=0., ncol=N)
 
     if do_count:
         for n in range(N):
             ax = fig.add_subplot(int(s + str(n)))
-            plt.hist(rewards[:,n], bins=2)
+            if len(ts) == 2:
+                plt.hist(rewards[ts[0]:ts[1],n], bins=2)
+            else:
+                plt.hist(rewards[:,n], bins=2)
 
     if show_title:
         fig.suptitle(ddir)
@@ -60,7 +86,7 @@ def reward(ddir, do_count, quiet, show_title):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "cTqh")
+        opts, args = getopt.getopt(sys.argv[1:], "ct:Tqh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -73,10 +99,16 @@ def main():
     do_count = False
     show_title = False
     quiet = False
+    ts = []
 
     for o, a in opts:
         if o == '-c':
             do_count = True
+        elif o == '-t':
+            ts = a.split(',')
+            if len(ts) != 2:
+                print("invalid time range specification: {}".format(a))
+                sys.exit(-1)
         elif o == '-T':
             show_title = True
         elif o == '-q':
@@ -88,7 +120,7 @@ def main():
             assert False, "unhandled option"
 
     for arg in args:
-        reward(arg, do_count, quiet, show_title)
+        reward(arg, np.array(ts, np.int32), do_count, quiet, show_title)
 
 if __name__ == '__main__':
     main()
