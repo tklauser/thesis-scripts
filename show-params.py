@@ -21,6 +21,11 @@ OUTPUT_FUNCTIONS = {
         1: 'sigmoid',
 }
 
+REWARD_QTY = {
+        0: 'distance',
+        1: 'red',
+}
+
 def usage():
     print("""usage: {} [OPTION...] DIRECTORY...
 
@@ -54,6 +59,8 @@ def show_params(d, params_file, recursive):
             v = OUTPUT_FUNCTIONS[int(params[l])]
             if v == 'linear':
                 linear = True
+        elif l == 'rewardQty':
+            v = REWARD_QTY[int(params[l])]
         else:
             v = params[l]
 
