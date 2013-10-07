@@ -7,14 +7,16 @@
 import os
 from collections import OrderedDict
 
-def import_params(ddir, pfile='params.log'):
+def import_params(ddir, pfile='params.log', verbose=True):
     if not os.path.isdir(ddir):
-        print("{} is not a directory".format(ddir))
+        if verbose:
+            print("{} is not a directory".format(ddir))
         return None
 
     p = os.path.join(ddir, pfile)
     if not os.path.isfile(p):
-        print("parameter file {} not found".format(p))
+        if verbose:
+            print("parameter file {} not found".format(p))
         return None
 
     f = open(p, 'r')
@@ -23,11 +25,13 @@ def import_params(ddir, pfile='params.log'):
     f.close()
 
     if len(labels) == 0 or len(values) == 0:
-        print("no parameters found in {}".format(p))
+        if verbose:
+            print("no parameters found in {}".format(p))
         return None
 
     if len(labels) != len(values):
-        print("number of labels doesn't correspond to number of values in {}".format(p))
+        if verbose:
+            print("number of labels doesn't correspond to number of values in {}".format(p))
         return None
 
     # put parameters into a directory, accessable by parameter name

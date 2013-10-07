@@ -46,7 +46,9 @@ def show_params(d, params_file, recursive):
             if os.path.isdir(dd):
                 show_params(dd, params_file, recursive)
 
-    params = import_params(d, params_file)
+    params = import_params(d, params_file, verbose=False)
+    if not params:
+        return
 
     print("experiment {}".format(d))
     linear = False
