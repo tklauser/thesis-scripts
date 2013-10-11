@@ -7,7 +7,7 @@ import fnmatch
 import re
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import import_params, get_cmap
+from utils import import_params, get_weights, get_cmap
 
 def usage():
     print("""usage: {} [OPTION...] DIRECTORY...
@@ -49,37 +49,10 @@ def force_fields(ddir, ts, wta, continuous, csteps, subplot, quiet, show_title, 
 
     nInputs = nRows * nCols
 
-    files = os.listdir(ddir)
-    xfiles = fnmatch.filter(files, 'weights_x_in*.log')
-    yfiles = fnmatch.filter(files, 'weights_y_in*.log')
-    nx = len(xfiles)
-    ny = len(yfiles)
-
-    if nx == 0 or ny == 0 or nx != ny or nx != nInputs:
-        print("""not enough weight files in your data directory,
-                 should be {} (nInputs), but only {}/{} (x/y) found""".format(nInputs, nx, ny))
+    Wx, Wy = get_weights(ddir, nInputs, nOutputs)
+    if Wx is None or Wy is None:
+        print("failed to read weights")
         return
-
-    # determine size of files for array preallocation
-    sx = np.genfromtxt(os.path.join(ddir, xfiles[0]), delimiter=',').shape
-    sy = np.genfromtxt(os.path.join(ddir, yfiles[0]), delimiter=',').shape
-
-    # TODO: plausibility checks on sx, sy wrt nOutputs
-
-    Wx = np.zeros([sx[0], nOutputs + 1, nx])
-    Wy = np.zeros([sy[0], nOutputs + 1, ny])
-
-    # files don't necessarily get listed in numerically correct order, thus
-    # extract index number from the file name
-    pattern = re.compile('weights_x_in_(\d+).*\.log')
-    for i in range(nx):
-        n = int(pattern.match(xfiles[i]).group(1))
-        Wx[:,:, n] = np.genfromtxt(os.path.join(ddir, xfiles[i]), delimiter=',')
-
-    pattern = re.compile('weights_y_in_(\d+).*\.log')
-    for i in range(ny):
-        n = int(pattern.match(yfiles[i]).group(1))
-        Wy[:,:, n] = np.genfromtxt(os.path.join(ddir, yfiles[i]), delimiter=',')
 
     intervalX = (popMaxX - popMinX) / (nOutputs - 1)
     intervalY = (popMaxY - popMinY) / (nOutputs - 1)
@@ -105,10 +78,10 @@ def force_fields(ddir, ts, wta, continuous, csteps, subplot, quiet, show_title, 
         elif t < 0:
             t = 0
 
-        dx = np.zeros([nx, 1])
-        dy = np.zeros([ny, 1])
+        dx = np.zeros([nInputs, 1])
+        dy = np.zeros([nInputs, 1])
 
-        for n in range(nx):
+        for n in range(nInputs):
             wxt = Wx[t,1:,n]
             wyt = Wy[t,1:,n]
 
@@ -217,7 +190,7 @@ def main():
         else:
             assert False, "unhandled option"
 
-    cmap = get_cmap(cmap)
+    cmap = get_cmap(cmap, default='Blues')
 
     for ddir in args:
         force_fields(ddir, np.array(ts, np.int32), wta, continuous, csteps, subplot, quiet, show_title, cmap=cmap)
