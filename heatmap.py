@@ -80,7 +80,7 @@ def heatmap(ddir, ts, subplot, quiet, show_title, cmap=None):
         ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='on')
         ax.set_xlim(0, nCols)
         ax.set_ylim(0, nRows)
-        ax.set_title("time step {}".format(t, time[t]), fontsize=12)
+        ax.set_title("time step {}".format(t), fontsize=12)
 
     if show_title:
         fig.suptitle(ddir)
