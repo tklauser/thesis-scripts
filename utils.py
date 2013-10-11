@@ -5,6 +5,9 @@
 # Copyright (C) 2013 Tobias Klauser <tklauser@distanz.ch>
 
 import os
+import fnmatch
+import re
+import numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
@@ -37,6 +40,46 @@ def import_params(ddir, pfile='params.log', verbose=True):
 
     # put parameters into a directory, accessable by parameter name
     return OrderedDict(zip(labels, values))
+
+def get_weights(ddir, nInputs, nOutputs, verbose=True):
+    files = os.listdir(ddir)
+    xfiles = fnmatch.filter(files, 'weights_x_in*.log')
+    yfiles = fnmatch.filter(files, 'weights_y_in*.log')
+    nx = len(xfiles)
+    ny = len(yfiles)
+
+    if nx == 0 or ny == 0 or nx != ny or nx != nInputs:
+        if verbose:
+            print("""not enough weight files in your data directory,
+                     should be {} (nInputs), but only {}/{} (x/y) found""".format(nInputs, nx, ny))
+        return
+
+    # determine size of files for array preallocation
+    sx = np.genfromtxt(os.path.join(ddir, xfiles[0]), delimiter=',').shape
+    sy = np.genfromtxt(os.path.join(ddir, yfiles[0]), delimiter=',').shape
+
+    # the first column is time
+    if sx[1] - 1 != sy[1] - 1 != nOutputs:
+        if verbose:
+            print("""invalid number of outputs in weight files""")
+        return
+
+    Wx = np.zeros([sx[0], nOutputs + 1, nx])
+    Wy = np.zeros([sy[0], nOutputs + 1, ny])
+
+    # files don't necessarily get listed in numerically correct order, thus
+    # extract index number from the file name
+    pattern = re.compile('weights_x_in_(\d+).*\.log')
+    for i in range(nx):
+        n = int(pattern.match(xfiles[i]).group(1))
+        Wx[:,:, n] = np.genfromtxt(os.path.join(ddir, xfiles[i]), delimiter=',')
+
+    pattern = re.compile('weights_y_in_(\d+).*\.log')
+    for i in range(ny):
+        n = int(pattern.match(yfiles[i]).group(1))
+        Wy[:,:, n] = np.genfromtxt(os.path.join(ddir, yfiles[i]), delimiter=',')
+
+    return Wx, Wy
 
 def get_cmap(cmap, default='gray_r'):
     try:
