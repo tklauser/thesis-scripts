@@ -16,9 +16,12 @@ LEARNING_RULES = {
         3: 'Learning by Mistakes',
 }
 
-OUTPUT_FUNCTIONS = {
+ACTIVATION_FUNCTIONS = {
         0: 'linear',
-        1: 'sigmoid',
+        1: 'threshold',
+        2: 'sigmoid',
+        3: 'winner-take-all',
+        4: 'population',
 }
 
 REWARD_QTY = {
@@ -63,6 +66,8 @@ def show_params(d, params_file, recursive):
                 linear = True
         elif l == 'rewardQty':
             v = REWARD_QTY[int(params[l])]
+        elif l == 'activationFn':
+            v = ACTIVATION_FUNCTIONS[int(params[l])]
         else:
             v = params[l]
 
