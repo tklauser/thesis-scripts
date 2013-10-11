@@ -67,7 +67,7 @@ def heatmap(ddir, ts, subplot, quiet, show_title, cmap=None):
 
         p = ax.pcolormesh(x, y, incount, cmap=cmap, rasterized=True)
 
-        cb = fig.colorbar(p, ax=ax, shrink=0.8, pad=0.1, aspect=10)
+        cb = fig.colorbar(p, ax=ax, shrink=0.9, pad=0.1, aspect=10)
         cb.ax.tick_params(labelsize=8)
         cb.solids.set_edgecolor('face')
 #        cb.set_label('# of stimulations')
