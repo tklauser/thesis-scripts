@@ -1,10 +1,11 @@
 # *-* coding: utf-8 -*-
 #
-# show-params.py -- Show drobot experiment parametes in human-readable form
+# utils.py -- Usefult functions for other scripts
 #
 # Copyright (C) 2013 Tobias Klauser <tklauser@distanz.ch>
 
 import os
+import matplotlib.pyplot as plt
 from collections import OrderedDict
 
 def import_params(ddir, pfile='params.log', verbose=True):
@@ -36,3 +37,9 @@ def import_params(ddir, pfile='params.log', verbose=True):
 
     # put parameters into a directory, accessable by parameter name
     return OrderedDict(zip(labels, values))
+
+def get_cmap(cmap, default='gray_r'):
+    try:
+        cmap = plt.get_cmap(cmap)
+    except ValueError, e:
+        cmap = plt.get_cmap(default)

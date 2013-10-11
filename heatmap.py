@@ -5,7 +5,7 @@ import getopt
 import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
-from params import import_params
+from utils import import_params, get_cmap
 
 def usage():
     print("""usage: {} [OPTION...] DIRECTORY...
@@ -16,7 +16,7 @@ By default the plot is shown for the first and last time step.
 
 options:
 
-  -c CMAP     use CMAP als colormap, see help(colormaps) in matplotlib for a list
+  -C CMAP     use CMAP as colormap, see help(colormaps) in matplotlib for a list
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
   -s SUBPLOT  specify subplot layout (in matplotlib style, e.g. 23 for 2 rows/3 columns)
@@ -25,7 +25,7 @@ options:
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def heatmap(ddir, ts, cmap, subplot, quiet, show_title):
+def heatmap(ddir, ts, subplot, quiet, show_title, cmap=None):
     params = import_params(ddir)
 
     try:
@@ -43,12 +43,6 @@ def heatmap(ddir, ts, cmap, subplot, quiet, show_title):
     [x, y] = np.meshgrid(np.arange(0, nRows + 1), np.arange(0, nCols + 1))
 
     fig = plt.figure()
-
-    # set the colormap
-    if cmap != None:
-        cmap = plt.get_cmap(cmap)
-    else:
-        cmap = plt.get_cmap('gray_r')
 
     for i, t in enumerate(ts):
         # use negative indices as in python
@@ -96,7 +90,7 @@ def heatmap(ddir, ts, cmap, subplot, quiet, show_title):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "c:t:s:Tqh")
+        opts, args = getopt.getopt(sys.argv[1:], "C:t:s:Tqh")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -106,16 +100,17 @@ def main():
         usage()
         sys.exit(-1)
 
-    cm = None
     # show last timestep by default
     ts = [-1]
+
+    cmap = None
     subplot = None
     show_title = False
     quiet = False
 
     for o, a in opts:
-        if o == '-c':
-            cm = a
+        if o == '-C':
+            cmap = a
         elif o == '-t':
             ts = a.split(',')
             if len(ts) < 1:
@@ -133,8 +128,10 @@ def main():
         else:
             assert False, "unhandled option"
 
+    cmap = get_cmap(cmap)
+
     for arg in args:
-        heatmap(arg, np.array(ts, np.int32), cm, subplot, quiet, show_title)
+        heatmap(arg, np.array(ts, np.int32), subplot, quiet, show_title, cmap=cmap)
 
 if __name__ == '__main__':
     main()

@@ -5,7 +5,7 @@ import getopt
 import os, sys
 import numpy as np
 import matplotlib.pyplot as plt
-from params import import_params
+from utils import import_params
 
 def usage():
     print("""usage: {} [OPTION...] DIRECTORY...

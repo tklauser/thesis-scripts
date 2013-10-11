@@ -7,7 +7,7 @@ import fnmatch
 import re
 import numpy as np
 import matplotlib.pyplot as plt
-from params import import_params
+from utils import import_params, get_cmap
 
 def usage():
     print("""usage: {} [OPTION...] DIRECTORY...
@@ -19,17 +19,20 @@ By default the plot is shown for the first and last time step.
 options:
 
   -c          enable continuous mode (time and subplot options are ignored)
+  -C CMAP     use CMAP as colormap in continuous mode, see help(colormaps) in
+              matplotlib for a list
   -t TIME...  comma-separated list (without space) of timestamps, negative
               numbers are intepreted as counting from the end (as in python)
-  -s SUBPLOT  specify subplot layout (in matplotlib style, e.g. 23 for 2 rows/3 columns)
+  -s SUBPLOT  specify subplot layout (e.g. 23 for 2 rows and 3 columns)
   -S STEP     specify time step to use in continous mode
   -T          show experiment path in figure title
   -q          quiet mode, don't show plot, only write PDF
-  -w          use winner-take-all instead of weighted sum to calculate resulting output
+  -w          use winner-take-all instead of weighted sum to calculate
+              resulting output
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def force_fields(ddir, ts, wta, continuous, csteps, subplot, quiet, show_title):
+def force_fields(ddir, ts, wta, continuous, csteps, subplot, quiet, show_title, cmap):
     params = import_params(ddir)
 
     try:
@@ -91,9 +94,6 @@ def force_fields(ddir, ts, wta, continuous, csteps, subplot, quiet, show_title):
         ts = range(0, T + 1, csteps)
 
     fig = plt.figure()
-#    cmap = plt.cm.jet
-    cmap = plt.cm.Blues
-#    cmap = plt.cm.Reds
 
     for i, t in enumerate(ts):
         # use negative indices as in python
@@ -170,7 +170,7 @@ def force_fields(ddir, ts, wta, continuous, csteps, subplot, quiet, show_title):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "chs:S:t:Tqw")
+        opts, args = getopt.getopt(sys.argv[1:], "cC:hs:S:t:Tqw")
     except getopt.GetoptError, err:
         print(str(err))
         usage()
@@ -182,6 +182,8 @@ def main():
 
     # show first and last timestep by default
     ts = [0, -1]
+
+    cmap = None
     continuous = False
     csteps = 10
     subplot = None
@@ -192,6 +194,8 @@ def main():
     for o, a in opts:
         if o == '-c':
             continuous = True
+        elif o == '-C':
+            cmap = a
         elif o == '-h':
             usage()
             sys.exit(0)
@@ -213,8 +217,10 @@ def main():
         else:
             assert False, "unhandled option"
 
-    for arg in args:
-        force_fields(arg, np.array(ts, np.int32), wta, continuous, csteps, subplot, quiet, show_title)
+    cmap = get_cmap(cmap)
+
+    for ddir in args:
+        force_fields(ddir, np.array(ts, np.int32), wta, continuous, csteps, subplot, quiet, show_title, cmap=cmap)
 
 if __name__ == '__main__':
     main()

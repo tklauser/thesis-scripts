@@ -7,7 +7,7 @@
 
 import getopt
 import os, sys
-from params import import_params
+from utils import import_params
 
 LEARNING_RULES = {
         0: 'Oja',
