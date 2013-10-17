@@ -22,9 +22,9 @@ options:
   -h          show this help and exit
 """.format(os.path.basename(sys.argv[0])))
 
-def plot_one(t, x, y, W, nInputs, nOutputs, fig, s, cmap):
-    ax = fig.add_subplot(int(s))
-    ax.set_xlabel('inputs', fontsize=8)
+def plot_one(t, x, y, W, nInputs, nOutputs, fig, ax, cmap, last):
+    if last:
+        ax.set_xlabel('inputs', fontsize=8)
     ax.set_ylabel('outputs', fontsize=8)
 
     p = ax.pcolormesh(x, y, W[t,:,:], cmap=cmap, rasterized=True)
@@ -33,7 +33,6 @@ def plot_one(t, x, y, W, nInputs, nOutputs, fig, s, cmap):
     cb.ax.tick_params(labelsize=8)
     cb.solids.set_edgecolor('face')
 
-    ax.set_aspect('equal', 'box')
     ax.set_xticks(np.arange(0.5, nInputs + 0.5, 5))
     ax.set_xticklabels(np.arange(0, nInputs + 1, 5), fontsize=8)
     ax.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='on')
@@ -42,7 +41,7 @@ def plot_one(t, x, y, W, nInputs, nOutputs, fig, s, cmap):
     ax.tick_params(axis='y', which='both', left='off', right='off', labelleft='on')
     ax.set_xlim(0, nInputs)
     ax.set_ylim(0, nOutputs)
-    ax.set_title("time step {}".format(t), fontsize=12)
+    ax.set_title("time step {}".format(t), fontsize=10)
 
 def weights(ddir, ts, quiet, show_title, cmap):
     params = import_params(ddir)
@@ -70,13 +69,13 @@ def weights(ddir, ts, quiet, show_title, cmap):
 
     [x, y] = np.meshgrid(np.arange(0, nInputs + 1), np.arange(0, nOutputs + 1))
 
-    figx = plt.figure()
-    figy = plt.figure()
+    N = len(ts)
+
+    figx, axesx = plt.subplots(N, sharex=True)
+    figy, axesy = plt.subplots(N, sharex=True)
 
     figx.suptitle('pan (X)')
     figy.suptitle('tilt (Y)')
-
-    N = len(ts)
 
     for i, t in enumerate(ts):
         # use negative indices as in python
@@ -88,9 +87,8 @@ def weights(ddir, ts, quiet, show_title, cmap):
         elif t < 0:
             t = 0
 
-        s = str(N) + '1' + str(i + 1)
-        plot_one(t, x, y, Wx, nInputs, nOutputs, figx, s, cmap)
-        plot_one(t, x, y, Wy, nInputs, nOutputs, figy, s, cmap)
+        plot_one(t, x, y, Wx, nInputs, nOutputs, figx, axesx[i], cmap, i == len(ts) - 1)
+        plot_one(t, x, y, Wy, nInputs, nOutputs, figy, axesy[i], cmap, i == len(ts) - 1)
 
     if not quiet:
         plt.show()
