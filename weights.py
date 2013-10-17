@@ -64,7 +64,7 @@ def weights(ddir, ts, quiet, show_title, cmap):
 
     time = Wx[:,0,0]
     T = len(time)
-    # omit time 
+    # omit time
     Wx = Wx[:,1:,:]
     Wy = Wy[:,1:,:]
 
@@ -72,6 +72,9 @@ def weights(ddir, ts, quiet, show_title, cmap):
 
     figx = plt.figure()
     figy = plt.figure()
+
+    figx.suptitle('pan (X)')
+    figy.suptitle('tilt (Y)')
 
     N = len(ts)
 
