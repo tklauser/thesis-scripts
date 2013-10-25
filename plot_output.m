@@ -36,11 +36,10 @@ end
 
 for t=1:T
     for i=1:nInputs
-        subplot(nInputs, 1, i);
+        subplot(nInputs, T, (t - 1) * nInputs + i);
         plot(outputs(t,:,i));
-        axis([1.0 10.0 -1.0 1.0]);        
-        title(sprintf('input %d', i - 1));       
+        axis([1.0 10.0 -1.0 1.0]);
+        axis square;
+        title(sprintf('input %d, t=%d', i - 1, t));       
     end
-
-    pause(1);
 end
