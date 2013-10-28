@@ -83,6 +83,8 @@ def get_weights(ddir, nInputs, nOutputs, verbose=True):
 
 def get_cmap(cmap, default='gray_r'):
     try:
-        cmap = plt.get_cmap(cmap)
+        cm = plt.get_cmap(cmap)
     except ValueError, e:
-        cmap = plt.get_cmap(default)
+        cm = plt.get_cmap(default)
+
+    return cm
