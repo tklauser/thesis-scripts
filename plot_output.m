@@ -40,7 +40,15 @@ cmap = interp1(linspace(0, 1, size(colormap, 1)), colormap, linspace(0.0,0.9,T))
 cmap = flipud(cmap);
 
 for i=1:nInputs
-    subplot(1, nInputs, i);
+    n = 1;
+    if mod(nInputs, 5) == 0
+        n = 5;
+    elseif mod(nInputs, 3) == 0
+        n = 3;
+    end
+
+    ax(i) = subplot(n, nInputs/n, i);
+
     for t=1:T
         hold on;
         %subplot(T, nInputs, (t-1)*T + i);
@@ -50,7 +58,14 @@ for i=1:nInputs
         ylabel('activity', 'FontSize', 18);
         hold off;
     end
-    axis([1.0 10.0 -1.0 1.0]);
+    axis([1 10.0 -1.5 1.5]);
     axis square;
     title(sprintf('input %d', i - 1));
 end
+
+% h = colorbar;
+% set(h, 'Position', [ .8314 .11 .0581 .8150 ])
+% for i=1:nInputs
+%     pos = get(ax(i), 'Position');
+%     set(ax(i), 'Position', [pos(1) pos(2) 0.85*pos(3) pos(4)]);
+% end
