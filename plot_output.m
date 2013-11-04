@@ -1,6 +1,8 @@
 % Plot the development of outputs over time
 function [] = plot_output(ddir)
 
+clear all, close all;
+
 nRows = 1;
 nCols = 5;
 nOutputs = 10;
@@ -29,38 +31,65 @@ nInputs = nRows * nCols;    % number of neurons in the input layer
 for i=1:nInputs
     tmp = load(fullfile(ddir, sprintf('out_x_in_%d.log', i - 1)));
     % strip off time
-    outputs(:,:,i) = tmp(:,2:end);
+    outputs_x(:,:,i) = tmp(:,2:end);
 end
 
-[T, ~, ~] = size(outputs);
+for i=1:nInputs
+    tmp = load(fullfile(ddir, sprintf('out_y_in_%d.log', i - 1)));
+    % strip off time
+    outputs_y(:,:,i) = tmp(:,2:end);
+end
+
+[T, ~, ~] = size(outputs_x);
 
 colormap bone;
 cmap = interp1(linspace(0, 1, size(colormap, 1)), colormap, linspace(0.0,0.9,T));
 % reverse, so the more recent data points are darker
 cmap = flipud(cmap);
 
-for i=1:nInputs
-    n = 1;
-    if mod(nInputs, 5) == 0
-        n = 5;
-    elseif mod(nInputs, 3) == 0
-        n = 3;
-    end
+N = 1;
+if mod(nInputs, 5) == 0
+    N = 5;
+elseif mod(nInputs, 3) == 0
+    N = 3;
+end
 
-    ax(i) = subplot(n, nInputs/n, i);
+figure(1);
+
+for i=1:nInputs
+    ax(i) = subplot(N, nInputs/N, nInputs - i + 1);
 
     for t=1:T
         hold on;
         %subplot(T, nInputs, (t-1)*T + i);
-        plot(outputs(t,:,i), 'color', cmap(t,:));
+        plot(outputs_x(t,:,i), 'color', cmap(t,:));
         set(gca,'FontSize',14)
-        xlabel('output neuron', 'FontSize', 18);
-        ylabel('activity', 'FontSize', 18);
+        %xlabel('output neuron', 'FontSize', 18);
+        %ylabel('activity', 'FontSize', 18);
         hold off;
     end
-    axis([1 10.0 -1.5 1.5]);
+    axis([1 10.0 -0.5 1.5]);
     axis square;
-    title(sprintf('input %d', i - 1));
+    title(sprintf('input x%d', i - 1));
+end
+
+figure(2);
+
+for i=1:nInputs
+    ax(i) = subplot(N, nInputs/N, nInputs - i + 1);
+
+    for t=1:T
+        hold on;
+        %subplot(T, nInputs, (t-1)*T + i);
+        plot(outputs_y(t,:,i), 'color', cmap(t,:));
+        set(gca,'FontSize',14)
+        %xlabel('output neuron', 'FontSize', 18);
+        %ylabel('activity', 'FontSize', 18);
+        hold off;
+    end
+    axis([1 10.0 -0.5 1.5]);
+    axis square;
+    title(sprintf('input y%d', i - 1));
 end
 
 % h = colorbar;
