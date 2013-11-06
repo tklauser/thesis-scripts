@@ -56,10 +56,12 @@ end
 
 figure(1);
 
+dt = floor(T / 10);
+
 for i=1:nInputs
     ax(i) = subplot(N, nInputs/N, nInputs - i + 1);
 
-    for t=1:T
+    for t=1:dt:T
         hold on;
         %subplot(T, nInputs, (t-1)*T + i);
         plot(outputs_x(t,:,i), 'color', cmap(t,:));
@@ -68,7 +70,7 @@ for i=1:nInputs
         %ylabel('activity', 'FontSize', 18);
         hold off;
     end
-    axis([1 10.0 -0.5 1.5]);
+    axis([1 nOutputs -0.5 1.5]);
     axis square;
     title(sprintf('input x%d', i - 1));
 end
@@ -87,7 +89,7 @@ for i=1:nInputs
         %ylabel('activity', 'FontSize', 18);
         hold off;
     end
-    axis([1 10.0 -0.5 1.5]);
+    axis([1 nOutputs -0.5 1.5]);
     axis square;
     title(sprintf('input y%d', i - 1));
 end
