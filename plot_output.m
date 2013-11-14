@@ -42,7 +42,7 @@ end
 
 [T, ~, ~] = size(outputs_x);
 
-colormap bone;
+colormap Hot;
 cmap = interp1(linspace(0, 1, size(colormap, 1)), colormap, linspace(0.0,0.9,T));
 % reverse, so the more recent data points are darker
 cmap = flipud(cmap);
@@ -56,7 +56,7 @@ end
 
 figure(1);
 
-dt = floor(T / 10);
+dt = max(floor(T / 20), 1);
 
 for i=1:nInputs
     ax(i) = subplot(N, nInputs/N, nInputs - i + 1);
@@ -64,7 +64,11 @@ for i=1:nInputs
     for t=1:dt:T
         hold on;
         %subplot(T, nInputs, (t-1)*T + i);
-        plot(outputs_x(t,:,i), 'color', cmap(t,:));
+        lw = 0.5;
+        if t == T
+            lw = 2.0;
+        end
+        plot(outputs_x(t,:,i), 'LineWidth', lw, 'Color', cmap(t,:));
         set(gca,'FontSize',14)
         %xlabel('output neuron', 'FontSize', 18);
         %ylabel('activity', 'FontSize', 18);
@@ -80,10 +84,14 @@ figure(2);
 for i=1:nInputs
     ax(i) = subplot(N, nInputs/N, nInputs - i + 1);
 
-    for t=1:T
+    for t=1:dt:T
         hold on;
-        %subplot(T, nInputs, (t-1)*T + i);
-        plot(outputs_y(t,:,i), 'color', cmap(t,:));
+
+        lw = 0.5;
+        if t == T
+            lw = 2.0;
+        end
+        plot(outputs_y(t,:,i), 'LineWidth', lw,  'Color', cmap(t,:));
         set(gca,'FontSize',14)
         %xlabel('output neuron', 'FontSize', 18);
         %ylabel('activity', 'FontSize', 18);
