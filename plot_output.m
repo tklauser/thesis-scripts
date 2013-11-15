@@ -69,12 +69,13 @@ for i=1:nInputs
             lw = 2.0;
         end
         plot(outputs_x(t,:,i), 'LineWidth', lw, 'Color', cmap(t,:));
-        set(gca,'FontSize',14)
+        set(gca, 'FontSize', 11);
+        set(gca, 'FontName', 'Times New Roman');
         %xlabel('output neuron', 'FontSize', 18);
         %ylabel('activity', 'FontSize', 18);
         hold off;
     end
-    axis([1 nOutputs -0.5 1.5]);
+    axis([1 nOutputs -0.5 2.5]);
     axis square;
     title(sprintf('input x%d', i - 1));
 end
@@ -92,12 +93,13 @@ for i=1:nInputs
             lw = 2.0;
         end
         plot(outputs_y(t,:,i), 'LineWidth', lw,  'Color', cmap(t,:));
-        set(gca,'FontSize',14)
+        set(gca, 'FontSize', 11);
+        set(gca, 'FontName', 'Times New Roman');
         %xlabel('output neuron', 'FontSize', 18);
         %ylabel('activity', 'FontSize', 18);
         hold off;
     end
-    axis([1 nOutputs -0.5 1.5]);
+    axis([1 nOutputs -0.5 2.5]);
     axis square;
     title(sprintf('input y%d', i - 1));
 end
@@ -108,3 +110,5 @@ end
 %     pos = get(ax(i), 'Position');
 %     set(ax(i), 'Position', [pos(1) pos(2) 0.85*pos(3) pos(4)]);
 % end
+
+tightfig;
