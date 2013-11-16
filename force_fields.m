@@ -6,6 +6,8 @@ function [dx,dy] = force_fields(ddir)
 videoQuality = 100;
 videoFPS = 4;
 plot_cols = 5;              % number of columns in the plot
+wta = 1;                    % use winner-take-all to detemine resulting
+                            % vector (instead of weighted sum)
 
 % experiment default values, can be overriden by params.log
 nRows = 5;                  % rows of the input image
@@ -95,11 +97,19 @@ for i=1:nx
         wxt = wx(t,:);
         wyt = wy(t,:);
 
-        oTotalX = sum(wxt);
-        oTotalY = sum(wyt);
+        if wta ~= 1
+            oTotalX = sum(wxt);
+            oTotalY = sum(wyt);
 
-        movex(t) = wxt * oMovementX ./ oTotalX;
-        movey(t) = wyt * oMovementY ./ oTotalY;
+            movex(t) = wxt * oMovementX ./ oTotalX;
+            movey(t) = wyt * oMovementY ./ oTotalY;
+        else
+            [ ~, amx ] = max(wxt, [], 2);
+            [ ~, amy ] = max(wyt, [], 2);
+
+            movex(t) = oMovementX(amx);
+            movey(t) = oMovementY(amy);
+        end
     end
 
     subplot(ceil(nx/plot_cols), plot_cols, i);
@@ -116,12 +126,16 @@ open(vid);
 
 figure(2);
 
-step = 1;
+step = 1; ff = 0;
 [idealx,idealy] = ideal_force_field(-2,2,-2,2,nRows,nCols);
 dideal = zeros(T,2);
 dirideal = zeros(T,2);
 
 for t=1:T
+    if ff
+        t = T;
+    end
+    
     dx = zeros(nx, 1);
     dy = zeros(nx, 1);
 
@@ -129,47 +143,64 @@ for t=1:T
         wxt = Wx(t,2:end,i);
         wyt = Wy(t,2:end,i);
 
-        oTotalX = sum(wxt);
-        oTotalY = sum(wyt);
+        if wta ~= 1
+            oTotalX = sum(wxt);
+            oTotalY = sum(wyt);
 
-        dx(i) = wxt * oMovementX ./ oTotalX;
-        dy(i) = wyt * oMovementY ./ oTotalY;
+            dx(i) = wxt * oMovementX ./ oTotalX;
+            dy(i) = wyt * oMovementY ./ oTotalY;
+        else
+            [ ~, amx ] = max(wxt, [], 2);
+            [ ~, amy ] = max(wyt, [], 2);
+
+            dx(i) = oMovementX(amx);
+            dy(i) = oMovementY(amy);
+        end
     end
 
     % convert to matrix
     dx = reshape(dx, nRows, nCols);
     dy = reshape(dy, nRows, nCols);
-    % correct order row <-> columns
-    dx = dx';
-    dy = dy';
-    % flip up to down since 0,0 is the input neuron for the upper left
-    % corner. Invert x since positive value means movement to the left.
-    dx = flipud(dx) * (-1.0);
-    dy = flipud(dy);
+    if nRows > 1
+        % correct order row <-> columns
+        dx = dx';
+        dy = dy';
+        % flip up to down since 0,0 is the input neuron for the upper left
+        % corner. Invert x since positive value means movement to the left.
+        dx = flipud(dx) * (-1.0);
+        dy = flipud(dy);
+    end
 
     % for each time step build up a quiver plot
-    quiver(dx,dy);
+    quiver(dx,dy, 'LineWidth', 2.0);
     axis square;
     axis([0,nCols+1,0,nRows+1]);
-    title(sprintf('step %d (t=%f)', t, Wx(t,1,1)));
+%    title(sprintf('step %d (t=%f)', t, Wx(t,1,1)));
 
-    dideal(t,1) = sum(sum(abs(dx - idealx)));
-    dideal(t,2) = sum(sum(abs(dy - idealy)));
+%    dideal(t,1) = sum(sum(abs(dx - idealx)));
+%    dideal(t,2) = sum(sum(abs(dy - idealy)));
 
     % compare direction to ideal direction
-    dirideal(t,1) = sum(sum(sign(dx) == sign(idealx)));
-    dirideal(t,2) = sum(sum(sign(dy) == sign(idealy)));
+%    dirideal(t,1) = sum(sum(sign(dx) == sign(idealx)));
+%    dirideal(t,2) = sum(sum(sign(dy) == sign(idealy)));
 
     f = getframe(2);
     writeVideo(vid, f);
     %pause(1/4);
+    
+    if ff
+        return
+    end
 
     if step == 1
-        ret = input('Select action: [s]tep, [c]ontinue, [q]uit: ', 's');
+        ret = input('Select action: [s]tep, [c]ontinue, [f]ast forward, [q]uit: ', 's');
         if ret == 's'
             step = 1;
         elseif ret == 'c'
             step = 0;
+        elseif ret == 'f'
+            step = 0;
+            ff = 1;
         elseif ret == 'q'
             return
         else
@@ -180,15 +211,15 @@ end
 
 close(vid);
 
-figure(3);
-plot(dideal);
-legend('x dimension', 'y dimension');
-title('cum. diff. of actual force field to ideal force field');
-
-figure(4)
-plot(dirideal);
-axis([0,T,0,nInputs]);
-legend('x dimension', 'y dimension');
-title('# of vectors with correct direction in x/y');
+% figure(3);
+% plot(dideal);
+% legend('x dimension', 'y dimension');
+% title('cum. diff. of actual force field to ideal force field');
+% 
+% figure(4)
+% plot(dirideal);
+% axis([0,T,0,nInputs]);
+% legend('x dimension', 'y dimension');
+% title('# of vectors with correct direction in x/y');
 
 end % function force_fields()
