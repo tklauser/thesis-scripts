@@ -15,6 +15,8 @@ if nargin < 1
     end
 end
 
+ddir
+
 % if we have a file specifying the parameters, use them from there
 if exist(fullfile(ddir, 'params.log'), 'file') == 2
     params = dlmread(fullfile(ddir, 'params.log'), ',', 1, 0);
@@ -48,7 +50,9 @@ cmap = interp1(linspace(0, 1, size(colormap, 1)), colormap, linspace(0.0,0.9,T))
 cmap = flipud(cmap);
 
 N = 1;
-if mod(nInputs, 5) == 0
+if mod(nInputs, 7) == 0
+    N = 7;
+elseif mod(nInputs, 5) == 0
     N = 5;
 elseif mod(nInputs, 3) == 0
     N = 3;
@@ -56,7 +60,7 @@ end
 
 figure(1);
 
-dt = max(floor(T / 20), 1);
+dt = max(floor(T / 24), 1);
 
 for i=1:nInputs
     ax(i) = subplot(N, nInputs/N, nInputs - i + 1);
@@ -65,7 +69,7 @@ for i=1:nInputs
         hold on;
         %subplot(T, nInputs, (t-1)*T + i);
         lw = 0.5;
-        if t == T
+        if t == T || t + dt > T
             lw = 2.0;
         end
         plot(outputs_x(t,:,i), 'LineWidth', lw, 'Color', cmap(t,:));
@@ -89,7 +93,7 @@ for i=1:nInputs
         hold on;
 
         lw = 0.5;
-        if t == T
+        if t == T || t + dt > T
             lw = 2.0;
         end
         plot(outputs_y(t,:,i), 'LineWidth', lw,  'Color', cmap(t,:));
