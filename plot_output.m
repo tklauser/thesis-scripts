@@ -60,17 +60,16 @@ end
 
 figure(1);
 
-dt = max(floor(T / 20), 1);
+dt = max(floor(T / 24), 1);
 
 for i=1:nInputs
     ax(i) = subplot(N, nInputs/N, nInputs - i + 1);
 
-    %for t=1:dt:T
-    t=T;
+    for t=1:dt:T
         hold on;
         %subplot(T, nInputs, (t-1)*T + i);
         lw = 0.5;
-        if t == T
+        if t == T || t + dt > T
             lw = 2.0;
         end
         plot(outputs_x(t,:,i), 'LineWidth', lw, 'Color', cmap(t,:));
@@ -78,7 +77,7 @@ for i=1:nInputs
         %xlabel('output neuron', 'FontSize', 18);
         %ylabel('activity', 'FontSize', 18);
         hold off;
-    %end
+    end
     axis([1 nOutputs -0.5 1.5]);
     axis square;
     title(sprintf('input x%d', i - 1));
@@ -89,12 +88,11 @@ figure(2);
 for i=1:nInputs
     ax(i) = subplot(N, nInputs/N, nInputs - i + 1);
 
-    %for t=1:dt:T
-    t=T;
+    for t=1:dt:T
         hold on;
 
         lw = 0.5;
-        if t == T
+        if t == T || t + dt > T
             lw = 2.0;
         end
         plot(outputs_y(t,:,i), 'LineWidth', lw,  'Color', cmap(t,:));
@@ -102,7 +100,7 @@ for i=1:nInputs
         %xlabel('output neuron', 'FontSize', 18);
         %ylabel('activity', 'FontSize', 18);
         hold off;
-    %end
+    end
     axis([1 nOutputs -0.5 1.5]);
     axis square;
     title(sprintf('input y%d', i - 1));
