@@ -81,10 +81,18 @@ def get_weights(ddir, nInputs, nOutputs, verbose=True):
 
     return Wx, Wy
 
+def save_weights_all(ddir, Wx, Wy, fmt='%1.12f', delim=',', verbose=True):
+    np.savetxt(os.path.join(ddir, "weights_all_x.log"), Wx, fmt=fmt, delimiter=delim)
+    if verbose:
+        print("Weight file for x-axis written to {}".format(os.path.join(ddir, 'weights_all_x.log')))
+    np.savetxt(os.path.join(ddir, "weights_all_y.log"), Wy, fmt=fmt, delimiter=delim)
+    if verbose:
+        print("Weight file for y-axis written to {}".format(os.path.join(ddir, 'weights_all_x.log')))
+
 def get_cmap(cmap, default='gray_r'):
     try:
         cm = plt.get_cmap(cmap)
-    except ValueError, e:
+    except ValueError as e:
         cm = plt.get_cmap(default)
 
     return cm

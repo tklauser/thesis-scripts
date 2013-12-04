@@ -23,7 +23,7 @@ def gen_weights_all(ddir):
         nRows = int(params['nRowsIn'])
         nCols = int(params['nColsIn'])
         nOutputs = int(params['nOutputs'])
-    except KeyError, err:
+    except (KeyError, TypeError) as err:
         print('necessary parameter not found: ' + str(err))
         sys.exit(-1)
 
@@ -33,12 +33,14 @@ def gen_weights_all(ddir):
     if Wx is None or Wy is None:
         print("failed to read weights")
         return
+
     # take most recent values, strip time and transpose so we can write column wise (like eigen)
     Wx, Wy = Wx[-1,1:,:].T, Wy[-1,1:,:].T
     # use final value and reshape to row vector
-    Wx, Wy = np.squeeze(Wx[-1,1:,:].reshape(1,-1)), np.squeeze(Wy.reshape(1,-1))
-    save_weights_all(ddir, Wx, Wy)
-    print("Weight files written to {}".format(ddir))
+    Wx, Wy = np.squeeze(Wx.reshape(-1,1)), np.squeeze(Wy.reshape(-1,1))
+    # prepend dummy time stamp
+    Wx, Wy = np.concatenate(([0.0],Wx)), np.concatenate(([0.0],Wy))
+    save_weights_all(ddir, [Wx], [Wy])
 
 def main():
     try:
