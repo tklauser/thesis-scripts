@@ -72,10 +72,10 @@ for i=1:nInputs
         plot(outputs(t,:,i), 'LineWidth', lw, 'Color', cmap(t,:));
         set(gca, 'FontSize', 8);
         set(gca, 'FontName', 'Times New Roman');
-        if i <= nCols
+        if i > nCols
             xlabel('output unit', 'FontSize', 11);
         end
-        if mod(i, nCols) == 0
+        if mod(i, nCols) == 1
             ylabel('activity', 'FontSize', 11);
         else
             set(gca, 'YTickLabel', [])
