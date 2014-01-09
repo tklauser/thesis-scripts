@@ -3,7 +3,6 @@ function [] = plot_output_handmouth(ddir)
 clear all, close all;
 
 % these parametes need to be manually adjusted to the experimental settings
-
 nRows = 2;      % number of rows in the input image
 nCols = 3;      % number of columns in the input image
 nOutputsX = 2;  % number of output neurons coding x-axis movement
@@ -16,8 +15,6 @@ if nargin < 1
         return
     end
 end
-
-ddir
 
 nInputs = nRows * nCols;    % number of neurons in the input layer
 
@@ -84,8 +81,8 @@ for i=1:nInputs
     end
     axis([1 nOutputs -0.5 1.5]);
     axis square;
-    set(gca,'XTick',1:10);
-    if i <= nCols
+    set(gca,'XTick',1:nOutputs);
+    if i > nInputs - nCols
         %set(gca,'XTickLabel',['0';' ';' ';' ';' ';' ';' ';' ';' ';'9']);
         set(gca,'XTickLabel',0:9);
     else
