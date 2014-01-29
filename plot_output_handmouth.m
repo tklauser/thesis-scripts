@@ -32,8 +32,8 @@ end
 
 [T, ~, ~] = size(outputs_x);
 
-colormap Hot;
-cmap = interp1(linspace(0, 1, size(colormap, 1)), colormap, linspace(0.0,0.9,T));
+colormap(hot);
+cmap = interp1(linspace(0, 1, size(colormap, 1)), colormap, linspace(0.0,0.75,T));
 % reverse, so the more recent data points are darker
 cmap = flipud(cmap);
 
@@ -61,7 +61,7 @@ for i=1:nInputs
     for t=1:dt:T
         hold on;
 
-        lw = 0.5;
+        lw = 0.75;
         if t == T || t + dt > T
             lw = 1.25;
         end
